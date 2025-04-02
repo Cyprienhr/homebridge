@@ -1,0 +1,364 @@
+/* Modern Authentication Styles for Child Adoption System */
+
+:root {
+  --primary-color: #4361ee;
+  --primary-light: #4895ef;
+  --primary-dark: #3a0ca3;
+  --secondary-color: #f72585;
+  --success-color: #4cc9f0;
+  --text-color: #2b2d42;
+  --text-light: #8d99ae;
+  --bg-color: #f8f9fa;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --transition-speed: 0.3s;
+  --box-shadow: 0 8px 32px rgba(0, 31, 63, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.8);
+  --input-border: rgba(0, 0, 0, 0.1);
+}
+
+/* General Auth Styles */
+.auth-container {
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    var(--primary-light) 0%,
+    var(--primary-dark) 100%
+  );
+  z-index: 1;
+}
+
+.auth-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../images/pattern.svg");
+  background-size: cover;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 500px;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: var(--box-shadow);
+  transform: translateY(0);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  position: relative;
+}
+
+.auth-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 31, 63, 0.15);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.auth-header::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-light),
+    var(--secondary-color)
+  );
+  border-radius: 2px;
+}
+
+.auth-header h3 {
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+/* Form Elements */
+.form-floating {
+  margin-bottom: 1.5rem;
+}
+
+.form-control {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  height: calc(3.5rem + 2px);
+  font-size: 1rem;
+  transition: all var(--transition-speed);
+  box-shadow: none;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.form-floating label {
+  padding: 1rem;
+  color: var(--text-light);
+}
+
+.input-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.password-toggle {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-left: none;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  color: var(--text-light);
+  transition: all var(--transition-speed);
+}
+
+.password-toggle:hover {
+  color: var(--primary-color);
+}
+
+/* Button Styles */
+.auth-btn {
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-dark) 100%
+  );
+  border: none;
+  color: white;
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.auth-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color) 0%,
+    var(--primary-light) 100%
+  );
+  transition: all 0.4s ease;
+  z-index: -1;
+}
+
+.auth-btn:hover::before {
+  width: 100%;
+}
+
+.auth-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.auth-btn:active {
+  transform: translateY(0);
+}
+
+/* Link Styles */
+.auth-links {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.auth-links p {
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+.auth-links a {
+  color: var(--primary-color);
+  font-weight: 600;
+  transition: all var(--transition-speed);
+  text-decoration: none;
+  position: relative;
+}
+
+.auth-links a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary-color);
+  transition: width var(--transition-speed);
+}
+
+.auth-links a:hover::after {
+  width: 100%;
+}
+
+/* Alert Styles */
+.alert {
+  border-radius: 10px;
+  border: none;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.alert::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+}
+
+.alert-success {
+  background-color: rgba(76, 201, 240, 0.1);
+  color: var(--success-color);
+}
+
+.alert-success::before {
+  background-color: var(--success-color);
+}
+
+.alert-danger {
+  background-color: rgba(247, 37, 133, 0.1);
+  color: var(--secondary-color);
+}
+
+.alert-danger::before {
+  background-color: var(--secondary-color);
+}
+
+/* Checkbox Style */
+.form-check {
+  padding-left: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.form-check-input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.15rem;
+  margin-left: -1.8rem;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 0.2rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.form-check-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+}
+
+.form-check-label {
+  color: var(--text-light);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.form-check-input:checked ~ .form-check-label {
+  color: var(--text-color);
+}
+
+/* Register Specific Styles */
+.section-title {
+  color: var(--text-color);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.section-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(
+    to bottom,
+    var(--primary-color),
+    var(--primary-light)
+  );
+  border-radius: 2px;
+}
+
+/* Create oscillating animation for focusing attention */
+@keyframes gentle-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.auth-btn:focus {
+  animation: gentle-pulse 1.5s infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .auth-card {
+    padding: 1.5rem;
+  }
+
+  .auth-header h3 {
+    font-size: 1.5rem;
+  }
+
+  .auth-btn {
+    padding: 0.7rem 1.2rem;
+  }
+}

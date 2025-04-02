@@ -1,0 +1,190 @@
+{% extends 'dashboard_base.html' %} {% load static %} {% load crispy_forms_tags
+%} {% block title %}{{ title }}{% endblock %} {% block page_title %}{{ title
+}}{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'appointments:appointment_list' %}">Appointments</a>
+</li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">{{ title }}</h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %} {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="row">
+              <!-- Adopter and Child Selection -->
+              <div class="col-md-6 mb-3">
+                <div class="form-group">
+                  {{ form.adopter.label_tag }} {{ form.adopter }} 
+                  {% if form.adopter.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.adopter.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="form-group">
+                  {{ form.child.label_tag }} {{ form.child }} 
+                  {% if form.child.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.child.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Appointment Details -->
+              <div class="col-md-6 mb-3">
+                <div class="form-group">
+                  <label for="id_appointment_date">Appointment Date:</label>
+                  <input
+                    type="text"
+                    name="appointment_date"
+                    id="id_appointment_date"
+                    class="form-control datepicker"
+                    value="{{ form.appointment_date.value|date:'Y-m-d H:i' }}"
+                    required
+                  />
+                  {% if form.appointment_date.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.appointment_date.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="form-group">
+                  {{ form.status.label_tag }} {{ form.status }} 
+                  {% if form.status.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.status.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="form-group">
+                  {{ form.application.label_tag }} {{ form.application }} 
+                  {% if form.application.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.application.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-12 mb-3">
+                <div class="form-group">
+                  {{ form.notes.label_tag }} {{ form.notes }} 
+                  {% if form.notes.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.notes.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-12 mt-3">
+                <hr />
+                <div class="d-flex justify-content-between">
+                  <a
+                    href="{% url 'appointments:appointment_list' %}"
+                    class="btn btn-secondary"
+                  >
+                    <i class="fas fa-arrow-left me-1"></i> Back to Appointments
+                  </a>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Save Appointment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Include Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+/>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add datepicker to appointment date field
+    try {
+      console.log("Initializing flatpickr...");
+      flatpickr(".datepicker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        time_24hr: true,
+        minDate: "today",
+        defaultHour: 9,
+        allowInput: true,
+        onOpen: function (selectedDates, dateStr, instance) {
+          console.log("Flatpickr opened");
+        },
+        onClose: function (selectedDates, dateStr, instance) {
+          console.log("Selected date: ", dateStr);
+        },
+      });
+      console.log("Flatpickr initialized successfully");
+    } catch (error) {
+      console.error("Error initializing flatpickr:", error);
+    }
+
+    // Dynamic filtering based on adopter selection
+    const adopterField = document.getElementById("id_adopter");
+    const applicationField = document.getElementById("id_application");
+
+    if (adopterField && applicationField) {
+      adopterField.addEventListener("change", function () {
+        const adopterId = this.value;
+        if (adopterId) {
+          // Fetch applications for this adopter and update the application dropdown
+          fetch(`/children/applications/?adopter_id=${adopterId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              // Clear current options except the empty one
+              while (applicationField.options.length > 1) {
+                applicationField.remove(1);
+              }
+
+              // Add new options
+              data.applications.forEach((app) => {
+                const option = new Option(
+                  `#${app.id} - ${app.child_name}`,
+                  app.id
+                );
+                applicationField.add(option);
+              });
+            })
+            .catch((error) =>
+              console.error("Error fetching applications:", error)
+            );
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

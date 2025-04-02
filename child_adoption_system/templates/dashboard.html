@@ -1,0 +1,308 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Dashboard - HomeBridge{% endblock %} {% block extra_css %}
+<style>
+  .dashboard-stats {
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    color: #0d6efd;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #212529;
+  }
+
+  .stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  .quick-actions {
+    background-color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .action-button {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #212529;
+  }
+
+  .action-button:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+    color: #0d6efd;
+  }
+
+  .action-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    color: #0d6efd;
+  }
+
+  .recent-activity {
+    background-color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .activity-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: #0d6efd;
+  }
+
+  .upcoming-appointments {
+    background-color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .appointment-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .appointment-item:last-child {
+    border-bottom: none;
+  }
+
+  .appointment-date {
+    font-weight: bold;
+    color: #0d6efd;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'dashboard:dashboard' %}">
+              <i class="fas fa-home"></i> Dashboard
+            </a>
+          </li>
+          {% if user.user_type == 'district_admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'child_list' %}">
+              <i class="fas fa-child"></i> Children
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'report_list' %}">
+              <i class="fas fa-file-alt"></i> Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'appointment_list' %}">
+              <i class="fas fa-calendar-alt"></i> Appointments
+            </a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' %}">
+              <i class="fas fa-user"></i> Profile
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'notifications' %}">
+              <i class="fas fa-bell"></i> Notifications {% if
+              unread_notifications %}
+              <span class="notification-badge">{{ unread_notifications }}</span>
+              {% endif %}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2">Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+              Share
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="row">
+        <div class="col-md-3">
+          <div class="dashboard-stats text-center">
+            <i class="fas fa-child stat-icon"></i>
+            <div class="stat-value">{{ total_children }}</div>
+            <div class="stat-label">Children in Care</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-stats text-center">
+            <i class="fas fa-check-circle stat-icon"></i>
+            <div class="stat-value">{{ pending_applications }}</div>
+            <div class="stat-label">Pending Applications</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-stats text-center">
+            <i class="fas fa-calendar-check stat-icon"></i>
+            <div class="stat-value">{{ upcoming_appointments }}</div>
+            <div class="stat-label">Upcoming Appointments</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="dashboard-stats text-center">
+            <i class="fas fa-bell stat-icon"></i>
+            <div class="stat-value">{{ unread_notifications }}</div>
+            <div class="stat-label">Unread Notifications</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h3 class="mb-4">Quick Actions</h3>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <a href="{% url 'child_create' %}" class="action-button">
+              <i class="fas fa-plus-circle action-icon"></i>
+              <span>Add New Child</span>
+            </a>
+          </div>
+          <div class="col-md-4 mb-3">
+            <a href="{% url 'report_create' %}" class="action-button">
+              <i class="fas fa-file-medical action-icon"></i>
+              <span>Create Report</span>
+            </a>
+          </div>
+          <div class="col-md-4 mb-3">
+            <a href="{% url 'appointment_create' %}" class="action-button">
+              <i class="fas fa-calendar-plus action-icon"></i>
+              <span>Schedule Appointment</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Recent Activity -->
+        <div class="col-md-8">
+          <div class="recent-activity">
+            <h3 class="mb-4">Recent Activity</h3>
+            {% for activity in recent_activities %}
+            <div class="activity-item d-flex align-items-center">
+              <div class="activity-icon">
+                <i class="fas {{ activity.icon }}"></i>
+              </div>
+              <div>
+                <p class="mb-0">{{ activity.description }}</p>
+                <small class="text-muted"
+                  >{{ activity.timestamp|timesince }} ago</small
+                >
+              </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">No recent activity</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="col-md-4">
+          <div class="upcoming-appointments">
+            <h3 class="mb-4">Upcoming Appointments</h3>
+            {% for appointment in upcoming_appointments %}
+            <div class="appointment-item">
+              <div class="appointment-date">
+                {{ appointment.date|date:"M d, Y" }}
+              </div>
+              <p class="mb-0">{{ appointment.title }}</p>
+              <small class="text-muted"
+                >{{ appointment.time|time:"g:i A" }}</small
+              >
+            </div>
+            {% empty %}
+            <p class="text-muted">No upcoming appointments</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  // Initialize tooltips
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
+  // Handle sidebar toggle
+  document.addEventListener("DOMContentLoaded", function () {
+    const sidebarToggle = document.querySelector("#sidebarToggle");
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener("click", function () {
+        document.querySelector(".sidebar").classList.toggle("show");
+      });
+    }
+  });
+</script>
+{% endblock %}

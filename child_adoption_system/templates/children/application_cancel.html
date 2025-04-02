@@ -1,0 +1,95 @@
+{% extends 'dashboard_base.html' %} 
+{% load static %} {% block title %}Cancel Application - {{ application.child.name }}{% endblock %} {% block page_title %}Cancel Application{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'children:application_list' %}">My Applications</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'children:application_detail' application.id %}"
+    >Application #{{ application.reference_number }}</a
+  >
+</li>
+<li class="breadcrumb-item active" aria-current="page">Cancel</li>
+{% endblock %} {% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">Cancel Application</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <h6><i class="fas fa-exclamation-triangle me-2"></i>Warning</h6>
+            <p class="mb-0">
+              You are about to cancel your adoption application for
+              <strong>{{ application.child.name }}</strong>. This action cannot
+              be undone.
+            </p>
+          </div>
+
+          <div class="application-info mb-4">
+            <h6 class="fw-bold">Application Details:</h6>
+            <ul class="list-group">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Reference Number:</span>
+                <span class="text-primary"
+                  >{{ application.reference_number }}</span
+                >
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Child:</span>
+                <span>{{ application.child.name }}</span>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Application Date:</span>
+                <span>{{ application.created_at|date:"M d, Y" }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="reason" class="form-label"
+                >Reason for Cancellation</label
+              >
+              <textarea
+                class="form-control"
+                id="reason"
+                name="reason"
+                rows="4"
+                placeholder="Please provide a reason for cancelling this application..."
+                required
+              ></textarea>
+              <div class="form-text">
+                This information will be shared with the administration.
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <a
+                href="{% url 'children:application_detail' application.id %}"
+                class="btn btn-outline-secondary me-2"
+              >
+                Cancel
+              </a>
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-times me-2"></i>Confirm Cancellation
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

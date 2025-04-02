@@ -1,0 +1,452 @@
+{% extends 'dashboard_base.html' %} 
+{% load static %} 
+{% block title %}District Admin Dashboard{% endblock %} {% block page_title %}District Admin Dashboard{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard</li>
+{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/district_admin_dashboard.css' %}" />
+{% endblock %} {% block content %}
+<!-- Stats Cards -->
+<div class="row mb-4">
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="data-card">
+      <div class="card-header">
+        <h6 class="m-0">Total Children</h6>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-3">
+            <div class="data-icon">
+              <i class="fas fa-child"></i>
+            </div>
+          </div>
+          <div class="col-9 text-end">
+            <div class="data-value">{{ children_count }}</div>
+            <div class="data-label"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="data-card">
+      <div class="card-header">
+        <h6 class="m-0">Applications</h6>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-3">
+            <div class="data-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          </div>
+          <div class="col-9 text-end">
+            <div class="data-value">{{ applications_count }}</div>
+            <div class="data-label"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="data-card">
+      <div class="card-header">
+        <h6 class="m-0">Appointments</h6>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-3">
+            <div class="data-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+          </div>
+          <div class="col-9 text-end">
+            <div class="data-value">{{ appointments_count }}</div>
+            <div class="data-label"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="data-card">
+      <div class="card-header">
+        <h6 class="m-0">Users</h6>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-3">
+            <div class="data-icon">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <div class="col-9 text-end">
+            <div class="data-value">{{ users_count }}</div>
+            <div class="data-label"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts and Recent Activities -->
+<div class="row mb-4">
+  <div class="col-xl-8 col-lg-7">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="m-0">Children & Applications Overview</h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="text-center mb-3">Children by Status</h6>
+            <div class="chart-container">
+              <canvas
+                id="childrenStatusChart"
+                data-available="{{ available_children }}"
+                data-pending="{{ pending_children }}"
+                data-adopted="{{ adopted_children }}"
+              >
+              </canvas>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-center mb-3">Applications by Status</h6>
+            <div class="chart-container">
+              <canvas
+                id="applicationsStatusChart"
+                data-pending="{{ pending_applications }}"
+                data-approved="{{ approved_applications }}"
+                data-rejected="{{ rejected_applications }}"
+              >
+              </canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h6 class="m-0">Recent Applications</h6>
+        <a
+          href="{% url 'children:application_list' %}"
+          class="btn btn-sm btn-primary"
+          >View All</a
+        >
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Adopter</th>
+                <th>Child</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for application in recent_applications %}
+              <tr>
+                <td>{{ application.created_at|date:"M d, Y" }}</td>
+                <td>{{ application.adopter.full_name }}</td>
+                <td>{{ application.child.name }}</td>
+                <td>
+                  <span
+                    class="status-badge {% if application.application_status == 'pending' %}pending{% elif application.application_status == 'approved' %}approved{% else %}rejected{% endif %}"
+                  >
+                    {{ application.get_application_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <a
+                      href="{% url 'children:application_detail' application.id %}"
+                      class="btn btn-sm btn-info"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center">
+                  No recent applications found
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4 col-lg-5">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="m-0">System Users</h6>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <canvas
+            id="userRolesChart"
+            data-adopters="{{ adopters_count }}"
+            data-leaders="{{ local_leaders_count }}"
+            data-hospitals="{{ hospitals_count }}"
+            data-admins="{{ district_admins_count }}"
+          >
+          </canvas>
+        </div>
+        <div class="row text-center mt-3">
+          <div class="col-6 col-md-3">
+            <div class="user-count">
+              <div class="user-count-icon">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="user-count-value">{{ district_admins_count }}</div>
+              <div class="user-count-label">Admins</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="user-count">
+              <div class="user-count-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="user-count-value">{{ adopters_count }}</div>
+              <div class="user-count-label">Adopters</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="user-count">
+              <div class="user-count-icon">
+                <i class="fas fa-building"></i>
+              </div>
+              <div class="user-count-value">{{ hospitals_count }}</div>
+              <div class="user-count-label">Hospitals</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="user-count">
+              <div class="user-count-icon">
+                <i class="fas fa-landmark"></i>
+              </div>
+              <div class="user-count-value">{{ local_leaders_count }}</div>
+              <div class="user-count-label">Leaders</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h6 class="m-0">Recent Activities</h6>
+      </div>
+      <div class="card-body">
+        <ul class="activity-list">
+          {% for activity in recent_activities %}
+          <li class="activity-item">
+            <div class="activity-icon">
+              <i class="fas fa-{{ activity.action_icon }}"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{ activity.object_repr }}</div>
+              <p>{{ activity.reason }}</p>
+              <div class="activity-meta">
+                <span>{{ activity.user.get_full_name }}</span>
+                <span class="activity-time"
+                  >{{ activity.timestamp|date:"M d, Y" }}</span
+                >
+              </div>
+            </div>
+          </li>
+          {% empty %}
+          <li class="text-center py-4">
+            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+            <p class="lead text-muted">No recent activities found</p>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming Appointments Section -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h6 class="m-0">Upcoming Appointments</h6>
+        <a
+          href="{% url 'appointments:appointment_list' %}"
+          class="btn btn-sm btn-primary"
+          >View All</a
+        >
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Child</th>
+                <th>Adopter</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for appointment in upcoming_appointments %}
+              <tr>
+                <td>
+                  {{ appointment.appointment_date|date:"M d, Y - h:i A" }}
+                </td>
+                <td>{{ appointment.child.name }}</td>
+                <td>{{ appointment.adopter.full_name }}</td>
+                <td>
+                  <span
+                    class="status-badge {% if appointment.status == 'pending' %}pending{% elif appointment.status == 'approved' %}approved{% elif appointment.status == 'cancelled' %}rejected{% else %}waiting{% endif %}"
+                  >
+                    {{ appointment.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <a
+                      href="{% url 'appointments:appointment_detail' appointment.id %}"
+                      class="btn btn-sm btn-info"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center">
+                  No upcoming appointments found
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Children Status Chart
+    const childrenCtx = document
+      .getElementById("childrenStatusChart")
+      .getContext("2d");
+    const childrenChart = new Chart(childrenCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["Available", "Pending", "Adopted"],
+        datasets: [
+          {
+            data: [
+              document.getElementById("childrenStatusChart").dataset.available,
+              document.getElementById("childrenStatusChart").dataset.pending,
+              document.getElementById("childrenStatusChart").dataset.adopted,
+            ],
+            backgroundColor: ["#00b8d4", "#ff9800", "#4caf50"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+      },
+    });
+
+    // Applications Status Chart
+    const applicationsCtx = document
+      .getElementById("applicationsStatusChart")
+      .getContext("2d");
+    const applicationsChart = new Chart(applicationsCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["Pending", "Approved", "Rejected"],
+        datasets: [
+          {
+            data: [
+              document.getElementById("applicationsStatusChart").dataset
+                .pending,
+              document.getElementById("applicationsStatusChart").dataset
+                .approved,
+              document.getElementById("applicationsStatusChart").dataset
+                .rejected,
+            ],
+            backgroundColor: ["#ff9800", "#4caf50", "#f44336"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+      },
+    });
+
+    // User Roles Chart
+    const userRolesCtx = document
+      .getElementById("userRolesChart")
+      .getContext("2d");
+    const userRolesChart = new Chart(userRolesCtx, {
+      type: "pie",
+      data: {
+        labels: ["Adopters", "Local Leaders", "Hospitals", "District Admins"],
+        datasets: [
+          {
+            data: [
+              document.getElementById("userRolesChart").dataset.adopters,
+              document.getElementById("userRolesChart").dataset.leaders,
+              document.getElementById("userRolesChart").dataset.hospitals,
+              document.getElementById("userRolesChart").dataset.admins,
+            ],
+            backgroundColor: ["#00b8d4", "#ff9800", "#4caf50", "#f44336"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              boxWidth: 12,
+            },
+          },
+        },
+      },
+    });
+  });
+</script>
+{% endblock %}

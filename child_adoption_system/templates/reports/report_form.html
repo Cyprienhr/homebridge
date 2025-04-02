@@ -1,0 +1,73 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'reports:report_list' %}">Reports</a></li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-8 col-md-10 mx-auto">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">{{ title }}</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <h6 class="text-muted mb-3">Child Information</h6>
+              </div>
+              
+              {% if form.non_field_errors %}
+              <div class="col-12 mb-3">
+                <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+                </div>
+              </div>
+              {% endif %}
+              
+              {% for field in form %}
+              <div class="col-md-{% if field.name == 'report_details' or field.name == 'district_admin_notes' %}12{% else %}6{% endif %} mb-3">
+                {{ field|as_crispy_field }}
+              </div>
+              {% endfor %}
+              
+              <div class="col-12 mt-3">
+                <hr>
+                <div class="d-flex justify-content-between">
+                  <a href="{% url 'reports:report_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Reports
+                  </a>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Save Report
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .asteriskField {
+    color: red;
+    margin-left: 2px;
+  }
+</style>
+{% endblock %}

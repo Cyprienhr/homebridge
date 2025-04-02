@@ -1,0 +1,810 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}Dashboard{% endblock %} | HomeBridge
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Google Fonts - Nunito -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+
+    <!-- Additional CSS -->
+    {% block extra_css %}{% endblock %}
+
+    <style>
+      /* Critical submenu styles to ensure they work */
+      .submenu {
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        list-style: none;
+        padding-left: 3.25rem;
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-item.has-submenu.open > .submenu {
+        display: block;
+        max-height: 1000px; /* Large enough for all submenu items */
+      }
+
+      .nav-item.has-submenu > a {
+        cursor: pointer;
+      }
+
+      .submenu-arrow {
+        margin-left: auto;
+        transition: transform 0.3s;
+      }
+
+      .nav-item.has-submenu.open .submenu-arrow {
+        transform: rotate(90deg);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggler" id="sidebarToggler">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a href="{% url 'dashboard:dashboard' %}" class="logo">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" />
+          <span>Child Adoption System</span>
+        </a>
+      </div>
+      <div class="topbar-right">
+        <ul class="topbar-nav">
+          <li class="nav-item">
+            <a href="{% url 'dashboard:dashboard' %}" class="nav-link">
+              <i class="fas fa-home"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="#"
+              class="nav-link"
+              id="notificationsDropdown"
+              data-bs-toggle="dropdown"
+            >
+              <i class="fas fa-bell"></i>
+              {% if notifications_count %}
+              <span class="badge bg-danger rounded-pill"
+                >{{ notifications_count }}</span
+              >
+              {% endif %}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="notificationsDropdown">
+              <div class="dropdown-header">Notifications</div>
+              {% if notifications %} {% for notification in notifications %}
+              <a
+                href="{{ notification.get_absolute_url }}"
+                class="dropdown-item"
+              >
+                <i class="fas fa-info-circle"></i>
+                {{ notification.message }}
+              </a>
+              {% endfor %} {% else %}
+              <div class="dropdown-item">No notifications</div>
+              {% endif %}
+              <div class="dropdown-divider"></div>
+              <a
+                href="{% url 'notifications:notification_list' %}"
+                class="dropdown-item text-center"
+                >View All</a
+              >
+            </div>
+          </li>
+          <li class="nav-item">
+            <a
+              href="#"
+              class="nav-link user-dropdown"
+              id="userDropdown"
+              data-bs-toggle="dropdown"
+            >
+              <div class="user-avatar">
+                {% if user.profile.profile_picture %}
+                <img
+                  src="{{ user.profile.profile_picture.url }}"
+                  alt="{{ user.username }}"
+                />
+                {% else %}
+                <i class="fas fa-user"></i>
+                {% endif %}
+              </div>
+              <span class="d-none d-lg-inline"
+                >{{ user.get_full_name|default:user.username }}</span
+              >
+            </a>
+            <div class="dropdown-menu" aria-labelledby="userDropdown">
+              <div class="dropdown-header">Account</div>
+              <a href="{% url 'accounts:profile' %}" class="dropdown-item">
+                <i class="fas fa-user"></i> Profile
+              </a>
+              <a
+                href="{% url 'accounts:change_password' %}"
+                class="dropdown-item"
+              >
+                <i class="fas fa-lock"></i> Change Password
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'accounts:logout' %}" class="dropdown-item">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          {% if user.profile.profile_picture %}
+          <img
+            src="{{ user.profile.profile_picture.url }}"
+            alt="{{ user.username }}"
+          />
+          {% else %}
+          <i class="fas fa-user"></i>
+          {% endif %}
+        </div>
+        <div class="user-info">
+          <h6>{{ user.get_full_name|default:user.username }}</h6>
+          <div class="user-role">{{ user.get_user_type_display }}</div>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <ul class="nav-sidebar">
+          {% if user.user_type == 'district_admin' %}
+          <li class="nav-item">
+            <a
+              href="{% url 'dashboard:admin_dashboard' %}"
+              class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"
+            >
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li class="nav-header">User Management</li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:local_leader_list' %}" class="nav-link">
+              <i class="fas fa-user-tie"></i>
+              <span>Local Leaders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:hospital_list' %}" class="nav-link">
+              <i class="fas fa-hospital"></i>
+              <span>Hospitals</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:adopter_list' %}" class="nav-link">
+              <i class="fas fa-users"></i>
+              <span>Adopters</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Children Management</li>
+          <li class="nav-item">
+            <a href="{% url 'children:child_list' %}" class="nav-link">
+              <i class="fas fa-child"></i>
+              <span>All Children</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'children:child_create' %}" class="nav-link">
+              <i class="fas fa-plus-circle"></i>
+              <span>Register New Child</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:child_list' %}?status=available"
+              class="nav-link"
+            >
+              <i class="fas fa-search"></i>
+              <span>Available Children</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:child_list' %}?status=pending"
+              class="nav-link"
+            >
+              <i class="fas fa-clock"></i>
+              <span>Pending Children</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:child_list' %}?status=adopted"
+              class="nav-link"
+            >
+              <i class="fas fa-home"></i>
+              <span>Adopted Children</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Applications</li>
+          <li class="nav-item">
+            <a href="{% url 'children:application_list' %}" class="nav-link">
+              <i class="fas fa-file-alt"></i>
+              <span>All Applications</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:application_list' %}?status=pending"
+              class="nav-link"
+            >
+              <i class="fas fa-spinner"></i>
+              <span>Pending Applications</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:application_list' %}?status=approved"
+              class="nav-link"
+            >
+              <i class="fas fa-check-circle"></i>
+              <span>Approved Applications</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:application_list' %}?status=rejected"
+              class="nav-link"
+            >
+              <i class="fas fa-times-circle"></i>
+              <span>Rejected Applications</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Appointments</li>
+          <li class="nav-item">
+            <a
+              href="{% url 'appointments:appointment_list' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-calendar-alt"></i>
+              <span>All Appointments</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'appointments:appointment_list' %}?status=pending"
+              class="nav-link"
+            >
+              <i class="fas fa-hourglass-half"></i>
+              <span>Pending Appointments</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'appointments:appointment_list' %}?status=approved"
+              class="nav-link"
+            >
+              <i class="fas fa-calendar-check"></i>
+              <span>Approved Appointments</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'appointments:appointment_list' %}?status=cancelled"
+              class="nav-link"
+            >
+              <i class="fas fa-calendar-times"></i>
+              <span>Cancelled Appointments</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'appointments:appointment_create' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-plus"></i>
+              <span>Create Appointment</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Reports</li>
+          <li class="nav-item">
+            <a href="{% url 'reports:report_list' %}" class="nav-link">
+              <i class="fas fa-flag"></i>
+              <span>All Reports</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'reports:report_list' %}?status=pending"
+              class="nav-link"
+            >
+              <i class="fas fa-exclamation-circle"></i>
+              <span>Pending Reports</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'reports:report_list' %}?status=resolved"
+              class="nav-link"
+            >
+              <i class="fas fa-check"></i>
+              <span>Resolved Reports</span>
+            </a>
+          </li>
+
+          <li class="nav-header">System</li>
+          <li class="nav-item">
+            <a
+              href="{% url 'notifications:notification_list' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-bell"></i>
+              <span>Notifications</span>
+              {% if notifications_count %}
+              <span class="badge bg-danger rounded-pill"
+                >{{ notifications_count }}</span
+              >
+              {% endif %}
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'audit:audit_log_list' %}" class="nav-link">
+              <i class="fas fa-history"></i>
+              <span>Audit Logs</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'dashboard:admin_dashboard' %}" class="nav-link">
+              <i class="fas fa-trash"></i>
+              <span>Trash</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Account</li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:profile' %}" class="nav-link">
+              <i class="fas fa-user-circle"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:change_password' %}" class="nav-link">
+              <i class="fas fa-lock"></i>
+              <span>Change Password</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:logout' %}" class="nav-link">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+          {% endif %} {% if user.user_type == 'adopter' %}
+          <li class="nav-item">
+            <a
+              href="{% url 'dashboard:adopter_dashboard' %}"
+              class="nav-link {% if request.resolver_match.url_name == 'adopter_dashboard' %}active{% endif %}"
+            >
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Adoption</li>
+          <li class="nav-item">
+            <a href="{% url 'children:child_list' %}" class="nav-link">
+              <i class="fas fa-child"></i>
+              <span>Available Children</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'children:application_list' %}" class="nav-link">
+              <i class="fas fa-file-alt"></i>
+              <span>My Applications</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'appointments:appointment_list' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-calendar-alt"></i>
+              <span>My Appointments</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fas fa-info-circle"></i>
+              <span>Adoption Process</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Notifications</li>
+          <li class="nav-item">
+            <a
+              href="{% url 'notifications:notification_list' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-bell"></i>
+              <span>Notifications</span>
+              {% if notifications_count %}
+              <span class="badge bg-danger rounded-pill"
+                >{{ notifications_count }}</span
+              >
+              {% endif %}
+            </a>
+          </li>
+
+          <li class="nav-header">Account</li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:profile' %}" class="nav-link">
+              <i class="fas fa-user-circle"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:change_password' %}" class="nav-link">
+              <i class="fas fa-lock"></i>
+              <span>Change Password</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:logout' %}" class="nav-link">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+          {% endif %} {% if user.user_type == 'hospital' %}
+          <li class="nav-item">
+            <a
+              href="{% url 'dashboard:hospital_dashboard' %}"
+              class="nav-link {% if request.resolver_match.url_name == 'hospital_dashboard' %}active{% endif %}"
+            >
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Abandoned Cases</li>
+          <li class="nav-item">
+            <a href="{% url 'reports:report_create' %}" class="nav-link">
+              <i class="fas fa-file-medical"></i>
+              <span>Report New Case</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'reports:report_list' %}" class="nav-link">
+              <i class="fas fa-file-alt"></i>
+              <span>View My Reports</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Children</li>
+          <li class="nav-item">
+            <a href="{% url 'children:child_create' %}" class="nav-link">
+              <i class="fas fa-baby"></i>
+              <span>Register Abandoned Child</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'children:child_list' %}" class="nav-link">
+              <i class="fas fa-list"></i>
+              <span>View Reported Children</span>
+            </a>
+          </li>
+
+          <li class="nav-header">System</li>
+          <li class="nav-item">
+            <a href="{% url 'audit:audit_log_list' %}" class="nav-link">
+              <i class="fas fa-trash"></i>
+              <span>Trash</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Account</li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:profile' %}" class="nav-link">
+              <i class="fas fa-user-cog"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:change_password' %}" class="nav-link">
+              <i class="fas fa-key"></i>
+              <span>Change Password</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'notifications:notification_list' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-bell"></i>
+              <span>Notifications</span>
+              {% if notifications_count %}
+              <span class="badge bg-danger rounded-pill"
+                >{{ notifications_count }}</span
+              >
+              {% endif %}
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:logout' %}" class="nav-link">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+          {% endif %} {% if user.user_type == 'local_leader' %}
+          <li class="nav-item">
+            <a
+              href="{% url 'dashboard:local_leader_dashboard' %}"
+              class="nav-link {% if request.resolver_match.url_name == 'local_leader_dashboard' %}active{% endif %}"
+            >
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Hospital Management</li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:create_hospital' %}" class="nav-link">
+              <i class="fas fa-hospital-plus"></i>
+              <span>Add Hospital</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:hospital_list' %}" class="nav-link">
+              <i class="fas fa-hospital"></i>
+              <span>View Hospitals</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Children Management</li>
+          <li class="nav-item">
+            <a href="{% url 'children:child_list' %}" class="nav-link">
+              <i class="fas fa-child"></i>
+              <span>All Children</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'children:child_create' %}" class="nav-link">
+              <i class="fas fa-plus-circle"></i>
+              <span>Register New Child</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:child_list' %}?status=available"
+              class="nav-link"
+            >
+              <i class="fas fa-search"></i>
+              <span>Available Children</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:child_list' %}?status=adopted"
+              class="nav-link"
+            >
+              <i class="fas fa-home"></i>
+              <span>Adopted Children</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Applications</li>
+          <li class="nav-item">
+            <a href="{% url 'children:application_list' %}" class="nav-link">
+              <i class="fas fa-file-alt"></i>
+              <span>All Applications</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'children:application_list' %}?status=pending"
+              class="nav-link"
+            >
+              <i class="fas fa-spinner"></i>
+              <span>Pending Applications</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Reports</li>
+          <li class="nav-item">
+            <a href="{% url 'reports:report_create' %}" class="nav-link">
+              <i class="fas fa-file-medical"></i>
+              <span>Create Report</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'reports:report_list' %}" class="nav-link">
+              <i class="fas fa-flag"></i>
+              <span>All Reports</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'reports:report_list' %}?status=pending"
+              class="nav-link"
+            >
+              <i class="fas fa-exclamation-circle"></i>
+              <span>Pending Reports</span>
+            </a>
+          </li>
+
+          <li class="nav-header">System</li>
+          <li class="nav-item">
+            <a
+              href="{% url 'notifications:notification_list' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-bell"></i>
+              <span>Notifications</span>
+              {% if notifications_count %}
+              <span class="badge bg-danger rounded-pill"
+                >{{ notifications_count }}</span
+              >
+              {% endif %}
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'audit:audit_log_list' %}" class="nav-link">
+              <i class="fas fa-history"></i>
+              <span>Audit Logs</span>
+            </a>
+          </li>
+
+          <li class="nav-header">Account</li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:profile' %}" class="nav-link">
+              <i class="fas fa-user-circle"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:change_password' %}" class="nav-link">
+              <i class="fas fa-lock"></i>
+              <span>Change Password</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'accounts:logout' %}" class="nav-link">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+      <div class="content-header">
+        <h1 class="page-title">
+          {% block page_title %}Dashboard{% endblock %}
+        </h1>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+            </li>
+            {% block breadcrumb %}{% endblock %}
+          </ol>
+        </nav>
+      </div>
+
+      {% if messages %}
+      <div class="messages mb-4">
+        {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="content-body">{% block content %}{% endblock %}</div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p class="mb-0">
+        &copy; {% now "Y" %} © 2025 Cyprien_hr. HomeBridge.
+      </p>
+      <p class="text-end mb-0"></p>
+    </div>
+
+    <!-- Scroll to top -->
+    <a href="#" class="scroll-to-top" id="scrollToTop">
+      <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <!-- Ensure submenus work properly -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Direct submenu toggle functionality
+        const submenuItems = document.querySelectorAll(".has-submenu > a");
+        submenuItems.forEach(function (item) {
+          item.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const parent = this.parentNode;
+            const submenu = parent.querySelector(".submenu");
+
+            // Close other open submenus
+            const openItems = document.querySelectorAll(".has-submenu.open");
+            openItems.forEach(function (openItem) {
+              if (openItem !== parent) {
+                openItem.classList.remove("open");
+                const otherSubmenu = openItem.querySelector(".submenu");
+                if (otherSubmenu) {
+                  otherSubmenu.style.maxHeight = null;
+                  otherSubmenu.style.display = "none";
+                }
+              }
+            });
+
+            // Toggle current submenu
+            parent.classList.toggle("open");
+
+            // Set maxHeight and display for the current submenu
+            if (submenu) {
+              if (parent.classList.contains("open")) {
+                submenu.style.display = "block";
+                submenu.style.maxHeight = submenu.scrollHeight + "px";
+              } else {
+                submenu.style.maxHeight = null;
+                setTimeout(() => {
+                  submenu.style.display = "none";
+                }, 300);
+              }
+            }
+          });
+        });
+
+        console.log("Submenu toggle handler installed");
+      });
+    </script>
+  </body>
+</html>

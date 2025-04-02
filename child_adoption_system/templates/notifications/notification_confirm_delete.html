@@ -1,0 +1,51 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Delete Notification{% endblock %}
+
+{% block page_title %}Delete Notification{% endblock %}
+
+{% block breadcrumb %}
+{% if user.user_type == 'district_admin' %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:admin_dashboard' %}">Dashboard</a></li>
+{% elif user.user_type == 'local_leader' %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:local_leader_dashboard' %}">Dashboard</a></li>
+{% elif user.user_type == 'hospital' %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:hospital_dashboard' %}">Dashboard</a></li>
+{% elif user.user_type == 'adopter' %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:adopter_dashboard' %}">Dashboard</a></li>
+{% else %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
+{% endif %}
+<li class="breadcrumb-item"><a href="{% url 'notifications:notification_list' %}">Notifications</a></li>
+<li class="breadcrumb-item active">Delete</li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-trash me-2 text-danger"></i> Delete Notification</h5>
+    </div>
+    <div class="card-body">
+        <p class="lead mb-4">Are you sure you want to delete this notification?</p>
+        
+        <div class="alert alert-warning">
+            <h5>{{ notification.title }}</h5>
+            <p class="mb-1">{{ notification.message }}</p>
+            <small class="text-muted"><i class="fas fa-clock me-1"></i> Received: {{ notification.created_at|date:"F j, Y, P" }}</small>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'notifications:notification_list' %}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash me-1"></i> Confirm Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

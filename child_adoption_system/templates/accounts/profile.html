@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Profile</h5>
+                    <div>
+                        <button id="edit-profile-btn" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                        <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-key"></i> Change Password
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Profile Information (visible by default) -->
+                    <div id="profile-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">Account Information</h6>
+                                <table class="table">
+                                    <tr>
+                                        <th style="width: 30%">Username:</th>
+                                        <td>{{ user.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Full Name:</th>
+                                        <td>{{ user.get_full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email:</th>
+                                        <td>{{ user.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Account Type:</th>
+                                        <td>{{ user.get_user_type_display }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">Additional Information</h6>
+                                <table class="table">
+                                    {% if user.user_type == 'district_admin' %}
+                                        <tr>
+                                            <th style="width: 30%">District:</th>
+                                            <td>{{ district_admin.district_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Contact Info:</th>
+                                            <td>{{ district_admin.contact_info|linebreaks }}</td>
+                                        </tr>
+                                    {% elif user.user_type == 'local_leader' %}
+                                        <tr>
+                                            <th style="width: 30%">Sector:</th>
+                                            <td>{{ local_leader.sector }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Cell:</th>
+                                            <td>{{ local_leader.cell }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Contact Info:</th>
+                                            <td>{{ local_leader.contact_info|linebreaks }}</td>
+                                        </tr>
+                                    {% elif user.user_type == 'hospital' %}
+                                        <tr>
+                                            <th style="width: 30%">Hospital Name:</th>
+                                            <td>{{ hospital.hospital_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Local Leader:</th>
+                                            <td>{{ hospital.local_leader.user.get_full_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Contact Info:</th>
+                                            <td>{{ hospital.contact_info|linebreaks }}</td>
+                                        </tr>
+                                    {% elif user.user_type == 'adopter' %}
+                                        <tr>
+                                            <th style="width: 30%">Address:</th>
+                                            <td>{{ adopter.address }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Contact Info:</th>
+                                            <td>{{ adopter.contact_info|linebreaks }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Identification:</th>
+                                            <td>{{ adopter.identification_number }}</td>
+                                        </tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Edit Profile Form (hidden by default) -->
+                    <div id="edit-profile-form" style="display: none;">
+                        <form method="post" action="{% url 'accounts:profile' %}">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold">Account Information</h6>
+                                    <div class="mb-3">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                                        {{ form.username }}
+                                        {% if form.username.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.username.errors|join:", " }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.first_name.errors|join:", " }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.last_name.errors|join:", " }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.email.errors|join:", " }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold">Additional Information</h6>
+                                    {% if user.user_type == 'district_admin' %}
+                                        <div class="mb-3">
+                                            <label for="{{ district_admin_form.district_name.id_for_label }}" class="form-label">District</label>
+                                            {{ district_admin_form.district_name }}
+                                            {% if district_admin_form.district_name.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ district_admin_form.district_name.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="{{ district_admin_form.contact_info.id_for_label }}" class="form-label">Contact Info</label>
+                                            {{ district_admin_form.contact_info }}
+                                            {% if district_admin_form.contact_info.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ district_admin_form.contact_info.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% elif user.user_type == 'local_leader' %}
+                                        <div class="mb-3">
+                                            <label for="{{ local_leader_form.sector.id_for_label }}" class="form-label">Sector</label>
+                                            {{ local_leader_form.sector }}
+                                            {% if local_leader_form.sector.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ local_leader_form.sector.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="{{ local_leader_form.cell.id_for_label }}" class="form-label">Cell</label>
+                                            {{ local_leader_form.cell }}
+                                            {% if local_leader_form.cell.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ local_leader_form.cell.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="{{ local_leader_form.contact_info.id_for_label }}" class="form-label">Contact Info</label>
+                                            {{ local_leader_form.contact_info }}
+                                            {% if local_leader_form.contact_info.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ local_leader_form.contact_info.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% elif user.user_type == 'hospital' %}
+                                        <div class="mb-3">
+                                            <label for="{{ hospital_form.hospital_name.id_for_label }}" class="form-label">Hospital Name</label>
+                                            {{ hospital_form.hospital_name }}
+                                            {% if hospital_form.hospital_name.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ hospital_form.hospital_name.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="{{ hospital_form.contact_info.id_for_label }}" class="form-label">Contact Info</label>
+                                            {{ hospital_form.contact_info }}
+                                            {% if hospital_form.contact_info.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ hospital_form.contact_info.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% elif user.user_type == 'adopter' %}
+                                        <div class="mb-3">
+                                            <label for="{{ adopter_form.address.id_for_label }}" class="form-label">Address</label>
+                                            {{ adopter_form.address }}
+                                            {% if adopter_form.address.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ adopter_form.address.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="{{ adopter_form.contact_info.id_for_label }}" class="form-label">Contact Info</label>
+                                            {{ adopter_form.contact_info }}
+                                            {% if adopter_form.contact_info.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ adopter_form.contact_info.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="{{ adopter_form.identification_number.id_for_label }}" class="form-label">Identification</label>
+                                            {{ adopter_form.identification_number }}
+                                            {% if adopter_form.identification_number.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ adopter_form.identification_number.errors|join:", " }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 text-end">
+                                <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Cancel</button>
+                                <button type="submit" class="btn btn-success">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileInfo = document.getElementById('profile-info');
+        const editProfileForm = document.getElementById('edit-profile-form');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        
+        editProfileBtn.addEventListener('click', function() {
+            profileInfo.style.display = 'none';
+            editProfileForm.style.display = 'block';
+        });
+        
+        cancelEditBtn.addEventListener('click', function() {
+            profileInfo.style.display = 'block';
+            editProfileForm.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

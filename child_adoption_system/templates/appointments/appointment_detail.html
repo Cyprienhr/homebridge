@@ -1,0 +1,129 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Appointment Details{% endblock %}
+
+{% block page_title %}Appointment Details{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'appointments:appointment_list' %}">Appointments</a></li>
+<li class="breadcrumb-item active">Appointment Details</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Appointment #{{ appointment.id }}</h5>
+                    <span class="badge {% if appointment.status == 'pending' %}bg-warning text-dark{% elif appointment.status == 'approved' %}bg-success{% elif appointment.status == 'cancelled' %}bg-danger{% elif appointment.status == 'completed' %}bg-info{% endif %}">
+                        {{ appointment.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="mb-1 text-muted small">Date & Time</p>
+                            <p class="fw-bold">{{ appointment.appointment_date|date:"F d, Y" }} at {{ appointment.appointment_date|date:"h:i A" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="mb-1 text-muted small">Location</p>
+                            <p class="fw-bold">{{ appointment.location }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">Participants</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="mb-1 text-muted small">Adopter</p>
+                            <p class="fw-bold">
+                                <a href="{% url 'accounts:edit_adopter' appointment.adopter.id %}">
+                                    {{ appointment.adopter.user.get_full_name }}
+                                </a>
+                            </p>
+                            <p class="small text-muted mb-0">Phone: {{ appointment.adopter.phone_number }}</p>
+                            <p class="small text-muted">Email: {{ appointment.adopter.user.email }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="mb-1 text-muted small">Child</p>
+                            <p class="fw-bold">
+                                <a href="{% url 'children:child_detail' appointment.child.id %}">
+                                    {{ appointment.child.name }}
+                                </a>
+                            </p>
+                            <p class="small text-muted mb-0">Age: {{ appointment.child.age }} years</p>
+                            <p class="small text-muted">Gender: {{ appointment.child.get_gender_display }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">Appointment Details</h6>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <p class="mb-1 text-muted small">Purpose</p>
+                            <p class="fw-bold">{{ appointment.purpose }}</p>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <p class="mb-1 text-muted small">Notes</p>
+                            <p>{{ appointment.notes|linebreaks|default:"No additional notes." }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if appointment.application %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">Related Application</h6>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="mb-1 text-muted small">Application ID</p>
+                            <p class="fw-bold">
+                                <a href="{% url 'children:application_detail' appointment.application.id %}">
+                                    #{{ appointment.application.id }}
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="mb-1 text-muted small">Application Status</p>
+                            <p class="fw-bold">
+                                <span class="badge {% if appointment.application.application_status == 'pending' %}bg-warning text-dark{% elif appointment.application.application_status == 'approved' %}bg-success{% elif appointment.application.application_status == 'rejected' %}bg-danger{% endif %}">
+                                    {{ appointment.application.get_application_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'appointments:appointment_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Back to Appointments
+                                </a>
+                                
+                                <div>
+                                    {% if appointment.status == 'pending' or appointment.status == 'approved' %}
+                                    {% if user.user_type == 'district_admin' %}
+                                    <a href="{% url 'appointments:appointment_update' appointment.id %}" class="btn btn-warning">
+                                        <i class="fas fa-edit me-1"></i> Update
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'appointments:appointment_cancel' appointment.id %}" class="btn btn-danger ms-2">
+                                        <i class="fas fa-times me-1"></i> Cancel
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

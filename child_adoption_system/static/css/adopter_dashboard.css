@@ -1,0 +1,458 @@
+/* Adopter Dashboard CSS - Child Adoption System */
+
+:root {
+  /* Main colors - Dark Theme */
+  --primary-color: #00c2cb; /* Aqua */
+  --primary-light: #4cdfdf;
+  --primary-dark: #008b8b;
+  --secondary-color: #a4a6b8;
+  --dark-gray: #2a2a3c;
+  --darker-gray: #1e1e2d;
+  --darkest-gray: #171723;
+  --dark-black: #111111;
+  --white: #ffffff;
+  --text-light: #ffffff; /* Changed from #e1e1ef to pure white for better contrast */
+  --text-muted: #d1d1e1; /* Lightened from #9193a9 for better contrast */
+
+  /* Status colors */
+  --success-color: #2ecc71;
+  --info-color: #3498db;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+}
+
+/* ====== Dashboard Specific Styles ====== */
+
+/* Sidebar for Adopter */
+.nav-sidebar .nav-link.active {
+  background-color: var(--primary-dark);
+  color: var(--white);
+  border-left: 4px solid var(--primary-color);
+}
+
+.nav-sidebar .nav-link {
+  color: var(--text-light); /* Ensure sidebar links are visible */
+}
+
+.nav-sidebar .nav-link:hover {
+  background-color: var(--dark-gray);
+  color: var(--primary-color);
+}
+
+/* Stats Cards */
+.dashboard-stats {
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background-color: var(--darkest-gray);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-left: 4px solid var(--primary-color);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+  color: var(--white);
+}
+
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-success {
+  background-color: var(--success-color);
+}
+
+.bg-info {
+  background-color: var(--info-color);
+}
+
+.stat-details h3 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+  background: linear-gradient(to right, #ffffff, var(--primary-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.stat-details p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 0;
+}
+
+/* Card styling */
+.card {
+  background-color: var(--darker-gray);
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.card-header {
+  background-color: var(--dark-gray);
+  border-bottom: 1px solid var(--darkest-gray);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h5 {
+  margin-bottom: 0;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.5rem;
+  color: var(
+    --text-light
+  ); /* Ensure all text in card bodies has good contrast */
+}
+
+/* Welcome banner */
+.welcome-banner .card {
+  border-left: 4px solid var(--primary-color);
+}
+
+.welcome-banner h4 {
+  color: var(--white);
+}
+
+.welcome-banner p {
+  color: var(--text-light);
+}
+
+.text-primary {
+  color: var(
+    --primary-light
+  ) !important; /* Lighter primary color for better contrast on dark backgrounds */
+}
+
+/* Table styling */
+.table {
+  color: var(--text-light);
+  margin-bottom: 0;
+}
+
+.table thead th {
+  border-bottom: 2px solid var(--dark-gray);
+  color: var(--text-light); /* Changed from --text-muted for better contrast */
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 0.75rem 1rem;
+}
+
+.table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-top: 1px solid var(--dark-gray);
+}
+
+.table tbody tr:hover {
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.05
+  ); /* Lighter hover effect for better contrast */
+}
+
+/* Text colors */
+.text-muted {
+  color: var(
+    --text-muted
+  ) !important; /* Lighter muted color for better contrast */
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+  color: var(--white) !important; /* Ensure bold text is highly visible */
+}
+
+/* Badge styling */
+.badge {
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  border-radius: 30px;
+  color: var(
+    --white
+  ); /* Ensure text in badges is always white for better contrast */
+}
+
+.bg-warning {
+  background-color: var(--warning-color) !important;
+}
+
+.bg-success {
+  background-color: var(--success-color) !important;
+}
+
+.bg-danger {
+  background-color: var(--danger-color) !important;
+}
+
+.bg-info {
+  background-color: var(--info-color) !important;
+}
+
+/* Notifications */
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  border-bottom: 1px solid var(--dark-gray);
+  transition: background-color 0.3s ease;
+}
+
+.notification-item:hover {
+  background-color: var(--dark-gray);
+}
+
+.notification-item.unread {
+  background-color: rgba(0, 194, 203, 0.05);
+  border-left: 3px solid var(--primary-color);
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--darkest-gray);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1rem;
+  color: var(--primary-light); /* Lighter aqua color for better contrast */
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content h6 {
+  margin-bottom: 0.25rem;
+  color: var(--white);
+}
+
+.notification-content p {
+  color: var(--text-light);
+  margin-bottom: 0.25rem;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+/* Adoption Process */
+.adoption-process-horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.process-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  width: 120px;
+  z-index: 2;
+}
+
+.process-line {
+  flex-grow: 1;
+  height: 3px;
+  background-color: var(--primary-dark);
+  margin: 0 5px;
+  position: relative;
+  top: -30px;
+  z-index: 1;
+}
+
+.process-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: var(--white);
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.process-step h6 {
+  color: var(--white);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.process-step p {
+  font-size: 0.8rem;
+  margin-bottom: 0;
+}
+
+/* Quick Links */
+.list-group-item {
+  background-color: var(--darker-gray);
+  border-color: var(--dark-gray);
+  color: var(--text-light);
+}
+
+.list-group-item:hover {
+  background-color: var(--dark-gray);
+}
+
+.list-group-item i {
+  color: var(--primary-light); /* Ensure icons stand out */
+}
+
+/* Custom button styles */
+.btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-light); /* Lighter color for better contrast */
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--dark-black); /* Dark text on light button */
+  font-weight: 600; /* Make text bold for better readability */
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+  color: var(--dark-black);
+}
+
+/* Button variants with appropriate contrast */
+.btn-outline-info {
+  border-color: var(--info-color);
+  color: var(--info-color);
+}
+
+.btn-outline-info:hover {
+  background-color: var(--info-color);
+  color: var(--white);
+}
+
+.btn-outline-danger {
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--danger-color);
+  color: var(--white);
+}
+
+.btn-outline-success {
+  border-color: var(--success-color);
+  color: var(--success-color);
+}
+
+.btn-outline-success:hover {
+  background-color: var(--success-color);
+  color: var(--white);
+}
+
+/* Empty state styling */
+.text-center.py-4 i {
+  color: var(--dark-gray);
+}
+
+.text-center.py-4 .lead {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-light); /* Ensure empty state text is visible */
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .adoption-process-horizontal {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .process-step {
+    margin: 1rem;
+  }
+
+  .process-line {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .stat-details h3 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .row.text-center .col {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+}

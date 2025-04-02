@@ -1,0 +1,319 @@
+/* Reports Dashboard CSS */
+:root {
+  --reports-primary: #5c6bc0;
+  --reports-secondary: #7986cb;
+  --reports-accent: #3f51b5;
+  --reports-light: #e8eaf6;
+  --reports-hover: #3949ab;
+  --reports-text: #212121;
+  --reports-text-light: #757575;
+  --reports-border: rgba(92, 107, 192, 0.2);
+}
+
+/* Sidebar customization */
+.sidebar {
+  background: linear-gradient(
+    to bottom,
+    var(--reports-primary),
+    var(--reports-accent)
+  );
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  border-left: 3px solid transparent;
+}
+
+.sidebar .nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #fff;
+}
+
+.sidebar .nav-link.active {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-left: 3px solid #fff;
+}
+
+.sidebar .sidebar-heading {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Custom card styling */
+.data-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  border: none;
+}
+
+.data-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.data-card .card-header {
+  background: linear-gradient(
+    45deg,
+    var(--reports-primary),
+    var(--reports-secondary)
+  );
+  color: white;
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.data-card .card-body {
+  padding: 1.5rem;
+}
+
+.data-card .data-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--reports-accent);
+}
+
+.data-card .data-label {
+  color: var(--reports-text-light);
+  font-weight: 500;
+}
+
+.data-card .data-icon {
+  background-color: var(--reports-light);
+  color: var(--reports-primary);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.35em 0.65em;
+  border-radius: 50rem;
+  display: inline-block;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.status-badge.approved,
+.status-badge.resolved,
+.status-badge.completed {
+  background-color: #4caf50;
+  color: white;
+}
+
+.status-badge.pending {
+  background-color: #ff9800;
+  color: white;
+}
+
+.status-badge.rejected,
+.status-badge.cancelled {
+  background-color: #f44336;
+  color: white;
+}
+
+.status-badge.in-progress {
+  background-color: var(--reports-primary);
+  color: white;
+}
+
+/* Table styling */
+.table thead th {
+  background-color: var(--reports-light);
+  color: var(--reports-accent);
+  border-bottom: 2px solid var(--reports-border);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(92, 107, 192, 0.05);
+}
+
+.table td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--reports-primary);
+  border-color: var(--reports-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--reports-hover);
+  border-color: var(--reports-hover);
+}
+
+.btn-action {
+  color: var(--reports-accent);
+  background-color: var(--reports-light);
+  border: none;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-action:hover {
+  background-color: rgba(92, 107, 192, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Action button colors */
+.btn-info {
+  background-color: #29b6f6;
+  border-color: #29b6f6;
+}
+
+.btn-success {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+.btn-warning {
+  background-color: #ffa726;
+  border-color: #ffa726;
+}
+
+.btn-danger {
+  background-color: #ef5350;
+  border-color: #ef5350;
+}
+
+/* Content header */
+.content-header {
+  border-bottom: 1px solid var(--reports-border);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.content-header h1 {
+  color: var(--reports-accent);
+  font-weight: 600;
+}
+
+/* Breadcrumbs */
+.breadcrumb-item a {
+  color: var(--reports-primary);
+}
+
+.breadcrumb-item.active {
+  color: var(--reports-text-light);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--reports-text-light);
+}
+
+/* Form control */
+.form-control:focus {
+  border-color: var(--reports-primary);
+  box-shadow: 0 0 0 0.25rem rgba(92, 107, 192, 0.25);
+}
+
+/* Empty state */
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+  background-color: var(--reports-light);
+  border-radius: 10px;
+  margin: 1rem 0;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--reports-primary);
+  margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+  color: var(--reports-accent);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--reports-text-light);
+  margin-bottom: 1.5rem;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--reports-light);
+  color: var(--reports-text-light);
+  border-top: 1px solid var(--reports-border);
+}
+
+/* Pagination */
+.pagination .page-link {
+  color: var(--reports-primary);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--reports-primary);
+  border-color: var(--reports-primary);
+}
+
+/* Alerts */
+.alert-success {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+.alert-info {
+  background-color: rgba(41, 182, 246, 0.1);
+  color: #0288d1;
+  border-color: rgba(41, 182, 246, 0.2);
+}
+
+.alert-warning {
+  background-color: rgba(255, 167, 38, 0.1);
+  color: #f57c00;
+  border-color: rgba(255, 167, 38, 0.2);
+}
+
+.alert-danger {
+  background-color: rgba(239, 83, 80, 0.1);
+  color: #d32f2f;
+  border-color: rgba(239, 83, 80, 0.2);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--reports-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--reports-hover);
+}

@@ -1,0 +1,418 @@
+{% extends 'dashboard_base.html' %} {% load static %} {% block title %}Adopter
+Dashboard{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/adopter_dashboard.css' %}" />
+{% endblock %} {% block page_title %}Adopter Dashboard{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %} {% block content %}
+<div class="content-body">
+  {% if messages %}
+  <div class="alert-container">
+    {% for message in messages %}
+    <div
+      class="alert alert-{{ message.tags }} alert-dismissible fade show"
+      role="alert"
+    >
+      {{ message }}
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="me-4">
+            <i class="fas fa-child fa-3x text-primary"></i>
+          </div>
+          <div>
+            <h4 class="mb-1">
+              Welcome, {{ user.get_full_name|default:user.username }}!
+            </h4>
+            <p class="mb-0">
+              Here's your adoption journey progress. Explore available children
+              and track your applications.
+            </p>
+          </div>
+          <div class="ms-auto">
+            <a href="{% url 'children:child_list' %}" class="btn btn-primary"
+              >Browse Children</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Stats -->
+  <div class="dashboard-stats">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon bg-primary">
+            <i class="fas fa-child"></i>
+          </div>
+          <div class="stat-details">
+            <h3>{{ available_children_count }}</h3>
+            <p>Available Children</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon bg-success">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="stat-details">
+            <h3>{{ my_applications_count }}</h3>
+            <p>My Applications</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon bg-info">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="stat-details">
+            <h3>{{ upcoming_appointments_count }}</h3>
+            <p>Upcoming Appointments</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Recent Applications -->
+      <div class="card recent-applications">
+        <div class="card-header">
+          <h5>My Recent Applications</h5>
+          <a
+            href="{% url 'children:application_list' %}"
+            class="btn btn-sm btn-outline-primary"
+            >View All</a
+          >
+        </div>
+        <div class="card-body">
+          {% if recent_applications %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Child</th>
+                  <th>Application Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for application in recent_applications %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      {% if application.child.photo %}
+                      <img
+                        src="{{ application.child.photo.url }}"
+                        alt="{{ application.child.name }}"
+                        class="rounded-circle me-2"
+                        width="40"
+                        height="40"
+                      />
+                      {% else %}
+                      <div
+                        class="rounded-circle bg-primary me-2"
+                        style="
+                          width: 40px;
+                          height: 40px;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        "
+                      >
+                        <i class="fas fa-child text-white"></i>
+                      </div>
+                      {% endif %}
+                      <div>
+                        <div class="fw-bold">{{ application.child.name }}</div>
+                        <small class="text-muted"
+                          >{{ application.child.gender|title }}, {{
+                          application.child.date_of_birth|timesince }}
+                          old</small
+                        >
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ application.created_at|date:"M d, Y" }}</td>
+                  <td>
+                    {% if application.application_status == 'pending' %}
+                    <span class="badge bg-warning">Pending</span>
+                    {% elif application.application_status == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                    {% elif application.application_status == 'rejected' %}
+                    <span class="badge bg-danger">Rejected</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a
+                      href="{% url 'children:application_detail' application.id %}"
+                      class="btn btn-sm btn-outline-info"
+                      title="View details"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    {% if application.application_status == 'pending' %}
+                    <a
+                      href="{% url 'children:cancel_application' application.id %}"
+                      class="btn btn-sm btn-outline-danger"
+                      title="Cancel application"
+                      onclick="event.preventDefault(); if(confirm('Are you sure you want to cancel this application?')) window.location.href='{% url 'children:cancel_application' application.id %}';"
+                    >
+                      <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+            <p class="lead text-muted">
+              You haven't submitted any applications yet.
+            </p>
+            <a href="{% url 'children:child_list' %}" class="btn btn-primary"
+              >Browse Available Children</a
+            >
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Upcoming Appointments -->
+      <div class="card upcoming-appointments mt-4">
+        <div class="card-header">
+          <h5>Upcoming Appointments</h5>
+          <a
+            href="{% url 'appointments:appointment_list' %}"
+            class="btn btn-sm btn-outline-primary"
+            >View All</a
+          >
+        </div>
+        <div class="card-body">
+          {% if upcoming_appointments %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Child</th>
+                  <th>Date & Time</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for appointment in upcoming_appointments %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      {% if appointment.child.photo %}
+                      <img
+                        src="{{ appointment.child.photo.url }}"
+                        alt="{{ appointment.child.name }}"
+                        class="rounded-circle me-2"
+                        width="40"
+                        height="40"
+                      />
+                      {% else %}
+                      <div
+                        class="rounded-circle bg-primary me-2"
+                        style="
+                          width: 40px;
+                          height: 40px;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        "
+                      >
+                        <i class="fas fa-child text-white"></i>
+                      </div>
+                      {% endif %} {{ appointment.child.name }}
+                    </div>
+                  </td>
+                  <td>
+                    <div>{{ appointment.appointment_date|date:"M d, Y" }}</div>
+                    <small class="text-muted"
+                      >{{ appointment.appointment_date|date:"h:i A" }}</small
+                    >
+                  </td>
+                  <td>
+                    {% if appointment.status == 'pending' %}
+                    <span class="badge bg-warning">Pending</span>
+                    {% elif appointment.status == 'approved' %}
+                    <span class="badge bg-success">Approved</span>
+                    {% elif appointment.status == 'completed' %}
+                    <span class="badge bg-info">Completed</span>
+                    {% elif appointment.status == 'cancelled' %}
+                    <span class="badge bg-danger">Cancelled</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a
+                      href="{% url 'appointments:appointment_detail' appointment.id %}"
+                      class="btn btn-sm btn-outline-info"
+                      title="View details"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    {% if appointment.status != 'cancelled' and appointment.status != 'completed' %}
+                    <a
+                      href="{% url 'appointments:appointment_cancel' appointment.id %}"
+                      class="btn btn-sm btn-outline-danger"
+                      title="Cancel appointment"
+                      onclick="event.preventDefault(); if(confirm('Are you sure you want to cancel this appointment?')) window.location.href='{% url 'appointments:appointment_cancel' appointment.id %}';"
+                    >
+                      <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+            <p class="lead text-muted">
+              You don't have any upcoming appointments.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Recent Notifications -->
+      <div class="card recent-notifications">
+        <div class="card-header">
+          <h5>Recent Notifications</h5>
+          <a
+            href="{% url 'notifications:notification_list' %}"
+            class="btn btn-sm btn-outline-primary"
+            >View All</a
+          >
+        </div>
+        <div class="card-body p-0">
+          {% if unread_notifications %}
+          <div class="notification-list">
+            {% for notification in unread_notifications %}
+            <div
+              class="notification-item {% if not notification.read %}unread{% endif %}"
+            >
+              <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+              </div>
+              <div class="notification-content">
+                <h6>{{ notification.title }}</h6>
+                <p>{{ notification.message|truncatechars:100 }}</p>
+                <small class="text-muted"
+                  >{{ notification.created_at|date:"M d, Y" }}</small
+                >
+              </div>
+              <div class="notification-actions">
+                <a
+                  href="{% url 'notifications:notification_detail' notification.id %}"
+                  class="btn btn-sm btn-outline-info"
+                  title="View details"
+                >
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a
+                  href="{% url 'notifications:mark_as_read' notification.id %}"
+                  class="btn btn-sm btn-outline-success"
+                  title="Mark as read"
+                >
+                  <i class="fas fa-check"></i>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+            <p class="lead text-muted">
+              You don't have any unread notifications.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adoption Process (Horizontal Layout) -->
+  <div class="card adoption-process mt-4">
+    <div class="card-header">
+      <h5>Adoption Process</h5>
+    </div>
+    <div class="card-body">
+      <div class="adoption-process-horizontal">
+        <div class="process-step">
+          <div class="process-icon bg-primary">
+            <i class="fas fa-search"></i>
+          </div>
+          <h6>1. Browse</h6>
+          <p class="small text-muted">Browse available children</p>
+        </div>
+        <div class="process-line"></div>
+        <div class="process-step">
+          <div class="process-icon bg-primary">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <h6>2. Apply</h6>
+          <p class="small text-muted">Submit application</p>
+        </div>
+        <div class="process-line"></div>
+        <div class="process-step">
+          <div class="process-icon bg-primary">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <h6>3. Meet</h6>
+          <p class="small text-muted">Attend appointment</p>
+        </div>
+        <div class="process-line"></div>
+        <div class="process-step">
+          <div class="process-icon bg-primary">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+          <h6>4. Approval</h6>
+          <p class="small text-muted">Get final approval</p>
+        </div>
+        <div class="process-line"></div>
+        <div class="process-step">
+          <div class="process-icon bg-primary">
+            <i class="fas fa-home"></i>
+          </div>
+          <h6>5. Adopt</h6>
+          <p class="small text-muted">Complete adoption</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/adopter_dashboard.js' %}"></script>
+{% endblock %}

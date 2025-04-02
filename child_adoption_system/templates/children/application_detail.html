@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Application Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Adoption Application Details</h5>
+                    <a href="{% url 'children:application_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Applications
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-5 mb-4 mb-md-0">
+                            <h6 class="text-muted mb-3">Child Information</h6>
+                            <div class="text-center mb-3">
+                                {% if application.child.photo %}
+                                    <img src="{{ application.child.photo.url }}" alt="{{ application.child.name }}" class="img-fluid rounded mb-2" style="max-height: 200px;">
+                                {% else %}
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center mb-2" style="height: 200px;">
+                                        <i class="fas fa-child fa-5x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <h5>{{ application.child.name }}</h5>
+                                <div>
+                                    <span class="badge bg-info">{{ application.child.get_gender_display }}</span>
+                                    <span class="badge bg-secondary">DOB: {{ application.child.date_of_birth|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            <div class="list-group">
+                                <div class="list-group-item">
+                                    <div class="small text-muted">Found Location</div>
+                                    <div>
+                                        {{ application.child.get_found_location_type_display }}
+                                        {% if application.child.found_location_type == 'hospital' and application.child.hospital %}
+                                            ({{ application.child.hospital.hospital_name }})
+                                        {% elif application.child.found_location_type == 'street' %}
+                                            ({{ application.child.village }}, {{ application.child.cell }}, {{ application.child.sector }}, {{ application.child.district }})
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="list-group-item">
+                                    <div class="small text-muted">Abandonment Date</div>
+                                    <div>{{ application.child.abandonment_date|date:"F d, Y" }}</div>
+                                </div>
+                                <div class="list-group-item">
+                                    <div class="small text-muted">Current Status</div>
+                                    <div>
+                                        <span class="badge bg-{% if application.child.status == 'available' %}success{% elif application.child.status == 'pending' %}warning{% else %}secondary{% endif %}">
+                                            {{ application.child.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if application.child.description %}
+                                    <div class="list-group-item">
+                                        <div class="small text-muted">Description</div>
+                                        <div>{{ application.child.description }}</div>
+                                    </div>
+                                {% endif %}
+                                <div class="list-group-item">
+                                    <a href="{% url 'children:child_detail' application.child.id %}" class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="fas fa-info-circle me-1"></i> View Child Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-7">
+                            <h6 class="text-muted mb-3">Application Details</h6>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header bg-{% if application.application_status == 'pending' %}warning{% elif application.application_status == 'approved' %}success{% else %}danger{% endif %} text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-clipboard-check me-1"></i> 
+                                        Application Status: {{ application.get_application_status_display }}
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-sm-6">
+                                            <p class="mb-1 small text-muted">Application Date:</p>
+                                            <p>{{ application.application_date|date:"F d, Y" }}</p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <p class="mb-1 small text-muted">Last Updated:</p>
+                                            <p>{{ application.updated_at|date:"F d, Y" }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if application.meeting_appointment %}
+                                        <div class="alert alert-{% if application.meeting_status == 'scheduled' %}info{% elif application.meeting_status == 'completed' %}success{% elif application.meeting_status == 'canceled' %}danger{% else %}secondary{% endif %} mb-3">
+                                            <h6 class="alert-heading">
+                                                <i class="fas fa-calendar-alt me-1"></i> Meeting Details
+                                            </h6>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <p class="mb-1 small">Date & Time:</p>
+                                                    <p class="mb-0">
+                                                        {{ application.meeting_appointment|date:"F d, Y" }} at 
+                                                        {{ application.meeting_appointment|date:"g:i A" }}
+                                                    </p>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <p class="mb-1 small">Status:</p>
+                                                    <p class="mb-0">
+                                                        <span class="badge bg-{% if application.meeting_status == 'scheduled' %}info{% elif application.meeting_status == 'completed' %}success{% else %}danger{% endif %}">
+                                                            {{ application.get_meeting_status_display }}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="mb-3">
+                                        <p class="mb-1 small text-muted">Notes:</p>
+                                        <p>{{ application.notes|default:"No notes provided." }}</p>
+                                    </div>
+                                    
+                                    {% if request.user.user_type == 'district_admin' and application.application_status == 'pending' %}
+                                        <div class="d-grid">
+                                            <a href="{% url 'children:update_application_status' application.id %}" class="btn btn-primary">
+                                                <i class="fas fa-edit me-1"></i> Update Application Status
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if request.user.user_type == 'adopter' and application.application_status == 'pending' %}
+                                        <div class="d-grid">
+                                            <a href="{% url 'children:cancel_application' application.id %}" class="btn btn-danger">
+                                                <i class="fas fa-times me-1"></i> Cancel Application
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if request.user.user_type != 'adopter' %}
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="fas fa-user me-1"></i> Applicant Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <p class="mb-1 small text-muted">Full Name:</p>
+                                            <p>{{ application.adopter.full_name }}</p>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-6">
+                                                <p class="mb-1 small text-muted">Age:</p>
+                                                <p>{{ application.adopter.age }} years</p>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <p class="mb-1 small text-muted">Marital Status:</p>
+                                                <p>{{ application.adopter.get_marital_status_display }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-6">
+                                                <p class="mb-1 small text-muted">Employment:</p>
+                                                <p>{{ application.adopter.get_employment_status_display }}</p>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <p class="mb-1 small text-muted">Income Level:</p>
+                                                <p>{{ application.adopter.get_income_level_display }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <p class="mb-1 small text-muted">Contact Information:</p>
+                                            <p>Email: {{ application.adopter.user.email }}</p>
+                                            <p>Phone: {{ application.adopter.user.phone_number }}</p>
+                                            <p>Address: {{ application.adopter.address|default:"Not provided" }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Adoption Process</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item p-3 {% if application.application_status != 'rejected' %}list-group-item-success{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <span class="process-number {% if application.application_status != 'rejected' %}bg-success{% else %}bg-secondary{% endif %} text-white">1</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Application Submitted</h6>
+                                    <p class="mb-0 small">{{ application.application_date|date:"F d, Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item p-3 {% if application.application_status == 'approved' or application.meeting_appointment %}list-group-item-success{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <span class="process-number {% if application.application_status == 'approved' or application.meeting_appointment %}bg-success{% else %}bg-secondary{% endif %} text-white">2</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Initial Review</h6>
+                                    <p class="mb-0 small">
+                                        {% if application.application_status == 'rejected' %}
+                                            Application was rejected
+                                        {% elif application.application_status == 'approved' or application.meeting_appointment %}
+                                            Application was reviewed
+                                        {% else %}
+                                            Pending review by district officials
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item p-3 {% if application.meeting_status == 'completed' %}list-group-item-success{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <span class="process-number {% if application.meeting_status == 'completed' %}bg-success{% else %}bg-secondary{% endif %} text-white">3</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Interview & Home Study</h6>
+                                    <p class="mb-0 small">
+                                        {% if application.meeting_status == 'completed' %}
+                                            Completed on {{ application.meeting_appointment|date:"F d, Y" }}
+                                        {% elif application.meeting_status == 'scheduled' %}
+                                            Scheduled for {{ application.meeting_appointment|date:"F d, Y" }}
+                                        {% elif application.meeting_status == 'canceled' %}
+                                            Meeting was canceled
+                                        {% else %}
+                                            Not scheduled yet
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item p-3 {% if application.application_status == 'approved' and application.meeting_status == 'completed' %}list-group-item-success{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <span class="process-number {% if application.application_status == 'approved' and application.meeting_status == 'completed' %}bg-success{% else %}bg-secondary{% endif %} text-white">4</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Final Approval</h6>
+                                    <p class="mb-0 small">
+                                        {% if application.application_status == 'approved' and application.meeting_status == 'completed' %}
+                                            Application has been fully approved
+                                        {% else %}
+                                            Pending completion of previous steps
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item p-3 {% if application.child.status == 'adopted' and application.application_status == 'approved' %}list-group-item-success{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <span class="process-number {% if application.child.status == 'adopted' and application.application_status == 'approved' %}bg-success{% else %}bg-secondary{% endif %} text-white">5</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Legal Process Complete</h6>
+                                    <p class="mb-0 small">
+                                        {% if application.child.status == 'adopted' and application.application_status == 'approved' %}
+                                            Adoption process completed
+                                        {% else %}
+                                            Pending completion of previous steps
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .process-number {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+</style>
+{% endblock %} 

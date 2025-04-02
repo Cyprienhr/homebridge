@@ -1,0 +1,192 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}View Reports{% endblock %}
+
+{% block page_title %}Reports{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:admin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Reports</li>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reports_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-end">
+        <a href="{% url 'reports:report_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> Create New Report
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0">Filter Reports</h6>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="report_type" class="form-label">Report Type</label>
+                <select name="report_type" id="report_type" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="MISSING" {% if request.GET.report_type == 'MISSING' %}selected{% endif %}>Missing Child</option>
+                    <option value="ABUSE" {% if request.GET.report_type == 'ABUSE' %}selected{% endif %}>Child Abuse</option>
+                    <option value="ORPHAN" {% if request.GET.report_type == 'ORPHAN' %}selected{% endif %}>Orphaned Child</option>
+                    <option value="OTHER" {% if request.GET.report_type == 'OTHER' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                    <option value="INVESTIGATING" {% if request.GET.status == 'INVESTIGATING' %}selected{% endif %}>Under Investigation</option>
+                    <option value="RESOLVED" {% if request.GET.status == 'RESOLVED' %}selected{% endif %}>Resolved</option>
+                    <option value="CLOSED" {% if request.GET.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="date_from" class="form-label">Date From</label>
+                <input type="date" class="form-control" name="date_from" id="date_from" value="{{ request.GET.date_from|default:'' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="date_to" class="form-label">Date To</label>
+                <input type="date" class="form-control" name="date_to" id="date_to" value="{{ request.GET.date_to|default:'' }}">
+            </div>
+            <div class="col-12 d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-1"></i> Apply Filters
+                </button>
+                <a href="{% url 'reports:report_list' %}" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-undo me-1"></i> Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if reports %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Child</th>
+                        <th>Reporter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>{{ report.date_reported|date:"M d, Y" }}</td>
+                        <td>
+                            {% if report.child %}
+                            {{ report.child.first_name }} {{ report.child.last_name }}
+                            {% else %}
+                            {{ report.child_name|default:"Unknown" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if report.reported_by %}
+                            {{ report.reported_by.get_full_name }}
+                            {% else %}
+                            {{ report.reporter_name|default:"Anonymous" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ report.get_report_type_display }}</td>
+                        <td>
+                            <span class="status-badge {{ report.status|lower }}">
+                                {{ report.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'reports:report_detail' report.id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if report.status != 'RESOLVED' and report.status != 'CLOSED' %}
+                                <a href="{% url 'reports:report_update' report.id %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'reports:report_delete' report.id %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <h4>No Reports Found</h4>
+            <p>There are no reports matching your criteria.</p>
+            <a href="{% url 'reports:report_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Create Your First Report
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if is_paginated %}
+<div class="row mt-4">
+    <div class="col-12">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

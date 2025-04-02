@@ -1,0 +1,44 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Welcome to HomeBridge{% endblock %} {% block extra_css %}
+<link href="{% static 'css/home.css' %}" rel="stylesheet" />
+{% endblock %} {% block content %}
+<!-- Full Screen Hero Section -->
+<section class="full-screen-hero">
+  <div class="container text-center">
+    <div class="hero-content">
+      <h1 class="display-3 mb-4">Making Dreams of Family Come True</h1>
+      <p class="lead mb-4">
+        Our HomeBridge connects children with loving families,
+        creating forever homes.
+      </p>
+
+      <div class="cta-content mt-5">
+        <h2 class="h3 mb-3">Ready to Start Your Adoption Journey?</h2>
+        <p class="mb-4">Join us in making a difference in children's lives</p>
+
+        {% if not user.is_authenticated %}
+        <div class="button-group">
+          <a
+            href="{% url 'accounts:register' %}"
+            class="btn btn-light btn-lg me-3"
+          >
+            Get Started
+          </a>
+          <a
+            href="{% url 'accounts:login' %}"
+            class="btn btn-outline-light btn-lg"
+          >
+            Login
+          </a>
+        </div>
+        {% else %}
+        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-light btn-lg">
+          Go to Dashboard
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

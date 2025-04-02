@@ -1,0 +1,193 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Appointments{% endblock %}
+
+{% block page_title %}Appointments{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Appointments</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header with Create Button -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-end">
+            {% if user.user_type == 'district_admin' %}
+            <a href="{% url 'appointments:appointment_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Schedule New Appointment
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="m-0">Filter Appointments</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date_from" class="form-label">Date From</label>
+                    <input type="date" class="form-control" name="date_from" id="date_from" value="{{ request.GET.date_from|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="date_to" class="form-label">Date To</label>
+                    <input type="date" class="form-control" name="date_to" id="date_to" value="{{ request.GET.date_to|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="adopter" class="form-label">Adopter</label>
+                    <input type="text" class="form-control" name="adopter" id="adopter" placeholder="Search by name" value="{{ request.GET.adopter|default:'' }}">
+                </div>
+                <div class="col-12 d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i> Apply Filters
+                    </button>
+                    <a href="{% url 'appointments:appointment_list' %}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-undo me-1"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="card">
+        <div class="card-body">
+            {% if appointments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Adopter</th>
+                            <th>Child</th>
+                            <th>Purpose</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.appointment_date|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'accounts:edit_adopter' appointment.adopter.id %}">
+                                    {{ appointment.adopter.user.get_full_name }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'children:child_detail' appointment.child.id %}">
+                                    {{ appointment.child.name }}
+                                </a>
+                            </td>
+                            <td>{{ appointment.purpose }}</td>
+                            <td>
+                                {% if appointment.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif appointment.status == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                                {% elif appointment.status == 'cancelled' %}
+                                <span class="badge bg-danger">Cancelled</span>
+                                {% elif appointment.status == 'completed' %}
+                                <span class="badge bg-info">Completed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'appointments:appointment_detail' appointment.id %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if appointment.status == 'pending' or appointment.status == 'approved' %}
+                                    <a href="{% url 'appointments:appointment_update' appointment.id %}" class="btn btn-outline-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'appointments:appointment_cancel' appointment.id %}" class="btn btn-outline-danger">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h4>No Appointments Found</h4>
+                <p class="text-muted">There are no appointments matching your criteria.</p>
+                {% if user.user_type == 'district_admin' %}
+                <a href="{% url 'appointments:appointment_create' %}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle me-1"></i> Schedule New Appointment
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
