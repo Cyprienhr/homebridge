@@ -1,0 +1,172 @@
+{% extends 'dashboard_base.html' %} 
+{% load static %} 
+{% load crispy_forms_tags %} {% block title %}Report Abandoned Child{% endblock %} {% block page_title %}Report Abandoned Child{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'reports:report_list' %}">Reports</a>
+</li>
+<li class="breadcrumb-item active">Report Abandoned Child</li>
+{% endblock %} {% block extra_css %}
+<style>
+  .asteriskField {
+    color: red;
+    margin-left: 2px;
+  }
+
+  .location-fields {
+    display: none;
+  }
+
+  .help-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+  }
+
+  .form-section {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-10 col-md-12 mx-auto">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Report Abandoned Child</h5>
+          <p class="mb-0 small">
+            Please provide all the information you have about the abandoned
+            child
+          </p>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %} {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <!-- Child Information Section -->
+            <div class="form-section">
+              <h5 class="form-section-title">
+                <i class="fas fa-child me-2"></i>Child Information
+              </h5>
+              <div class="row">
+                <div class="col-md-4 mb-3">{{ form.name|as_crispy_field }}</div>
+                <div class="col-md-4 mb-3">
+                  {{ form.gender|as_crispy_field }}
+                </div>
+                <div class="col-md-4 mb-3">
+                  {{ form.date_of_birth|as_crispy_field }}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  {{ form.photo|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                  {{ form.description|as_crispy_field }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Abandonment Details Section -->
+            <div class="form-section">
+              <h5 class="form-section-title">
+                <i class="fas fa-map-marker-alt me-2"></i>Abandonment Details
+              </h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  {{ form.abandonment_date|as_crispy_field }}
+                </div>
+                <div class="col-md-6 mb-3">
+                  {{ form.found_location_type|as_crispy_field }}
+                </div>
+              </div>
+
+              <div class="row location-fields" id="street-location-fields">
+                <div class="col-md-3 mb-3">
+                  {{ form.village|as_crispy_field }}
+                </div>
+                <div class="col-md-3 mb-3">{{ form.cell|as_crispy_field }}</div>
+                <div class="col-md-3 mb-3">
+                  {{ form.sector|as_crispy_field }}
+                </div>
+                <div class="col-md-3 mb-3">
+                  {{ form.district|as_crispy_field }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Report Details Section -->
+            <div class="form-section">
+              <h5 class="form-section-title">
+                <i class="fas fa-file-alt me-2"></i>Report Details
+              </h5>
+              <div class="row">
+                <div class="col-12 mb-3">
+                  {{ form.report_details|as_crispy_field }}
+                </div>
+              </div>
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Note:</strong> This report will be sent to the
+                appropriate authorities. Please provide as much detail as
+                possible.
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a
+                href="{% url 'reports:report_list' %}"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-arrow-left me-1"></i> Back to Reports
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane me-1"></i> Submit Report
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Show/hide location fields based on location type
+    const locationTypeSelect = document.getElementById(
+      "id_found_location_type"
+    );
+    const streetLocationFields = document.getElementById(
+      "street-location-fields"
+    );
+
+    function toggleLocationFields() {
+      if (locationTypeSelect.value === "street") {
+        streetLocationFields.style.display = "flex";
+      } else {
+        streetLocationFields.style.display = "none";
+      }
+    }
+
+    // Initialize
+    toggleLocationFields();
+
+    // On change
+    locationTypeSelect.addEventListener("change", toggleLocationFields);
+  });
+</script>
+{% endblock %}

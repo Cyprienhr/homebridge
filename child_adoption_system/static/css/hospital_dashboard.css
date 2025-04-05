@@ -6,16 +6,13 @@ Hospital Admin Dashboard Specific CSS
 
 /* Custom colors for Hospital Dashboard */
 :root {
-  --hospital-primary: #00c2cb; /* Aqua */
-  --hospital-secondary: #4cdfdf; /* Light Aqua */
-  --hospital-accent: #008b8b; /* Dark Aqua */
-  --hospital-light: #e0f7fa; /* Very Light Aqua */
-  --hospital-dark-gray: #2a2a3c; /* Dark Gray */
-  --hospital-darker-gray: #1e1e2d; /* Darker Gray */
-  --hospital-darkest-gray: #171723; /* Darkest Gray */
-  --hospital-black: #111111; /* Black */
+  --hospital-primary: #3f51b5; /* Primary Blue */
+  --hospital-secondary: #5c6bc0; /* Light Blue */
+  --hospital-accent: #303f9f; /* Dark Blue */
+  --hospital-light: #e8eaf6; /* Very Light Blue */
+  --hospital-dark: #212121; /* Dark Gray */
   --hospital-white: #ffffff; /* White */
-  --hospital-success: #2ecc71;
+  --hospital-success: #4caf50;
   --hospital-warning: #f39c12;
   --hospital-danger: #e74c3c;
   --hospital-info: #3498db;
@@ -23,7 +20,11 @@ Hospital Admin Dashboard Specific CSS
 
 /* Override sidebar colors */
 .sidebar {
-  background: var(--hospital-darkest-gray);
+  background: linear-gradient(
+    to bottom,
+    var(--hospital-primary),
+    var(--hospital-accent)
+  );
   border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -42,22 +43,22 @@ Hospital Admin Dashboard Specific CSS
 
 /* Enhance sidebar styling */
 .nav-sidebar .nav-link {
-  color: var(--hospital-white);
+  color: rgba(255, 255, 255, 0.8);
   border-left: 3px solid transparent;
   margin: 2px 0;
   transition: all 0.3s ease;
 }
 
 .nav-sidebar .nav-link:hover {
-  color: var(--hospital-primary);
-  background-color: rgba(0, 194, 203, 0.1);
-  border-left: 3px solid var(--hospital-primary);
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #ffffff;
 }
 
 .nav-sidebar .nav-link.active {
-  color: var(--hospital-white);
-  background-color: var(--hospital-accent);
-  border-left: 3px solid var(--hospital-primary);
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-left: 3px solid #ffffff;
 }
 
 .nav-header {
@@ -76,62 +77,64 @@ Hospital Admin Dashboard Specific CSS
 /* Custom data card styling */
 .data-card {
   border-radius: 10px;
-  background-color: var(--hospital-darker-gray);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
-  border: none;
-  margin-bottom: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  height: 100%;
 }
 
 .data-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
 }
 
-.data-card .card-header {
-  background-color: var(--hospital-dark-gray);
-  color: var(--hospital-white);
-  font-weight: 600;
-  border-bottom: none;
-  padding: 1rem 1.25rem;
-}
-
-.data-card .card-body {
-  padding: 1.5rem;
+.data-card .stats-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .data-card .data-value {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--hospital-white);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.5px;
-  display: inline-block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--hospital-text);
+  line-height: 1.2;
 }
 
 .data-card .data-label {
-  color: var(--hospital-secondary);
+  color: var(--hospital-text);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.data-card .data-sublabel {
+  color: var(--hospital-text-light);
   font-weight: 500;
+  font-size: 0.85rem;
+  margin-top: 2px;
 }
 
 .data-card .data-icon {
-  background-color: var(--hospital-accent);
-  color: var(--hospital-white);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  background-color: var(--hospital-primary);
+  color: white;
   font-size: 1.5rem;
+  margin-left: 10px;
 }
 
 /* Card styling */
 .card {
   border-radius: 0.75rem;
-  background-color: var(--hospital-darker-gray);
-  border: none;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   overflow: hidden;
@@ -143,47 +146,48 @@ Hospital Admin Dashboard Specific CSS
 }
 
 .card-header {
-  background-color: var(--hospital-dark-gray);
-  border-bottom: 1px solid var(--hospital-darkest-gray);
+  background-color: white;
+  border-bottom: 1px solid rgba(63, 81, 181, 0.1);
   padding: 1.25rem 1.5rem;
 }
 
 .card-header h5,
 .card-header h6 {
   font-weight: 700;
-  color: var(--hospital-white);
+  color: var(--hospital-dark);
   margin: 0;
 }
 
 .card-body {
   padding: 1.5rem;
-  color: var(--hospital-white);
+  color: var(--hospital-dark);
 }
 
 /* Table styling */
 .table {
-  margin-bottom: 0;
-  border-collapse: separate;
-  border-spacing: 0;
-  color: var(--hospital-white);
+  width: 100%;
+  margin-bottom: 1rem;
+  color: var(--hospital-dark);
+  background-color: transparent;
 }
 
 .table thead th {
-  background-color: var(--hospital-dark-gray);
-  color: var(--hospital-white);
-  border-bottom: 2px solid var(--hospital-darkest-gray);
-  padding: 0.75rem 1rem;
+  vertical-align: bottom;
+  border-bottom: 2px solid rgba(63, 81, 181, 0.1);
   font-weight: 600;
+  color: var(--hospital-dark);
+  background-color: rgba(63, 81, 181, 0.05);
+  padding: 0.75rem;
 }
 
 .table tbody td {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   vertical-align: middle;
-  border-top: 1px solid var(--hospital-darkest-gray);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .table tbody tr:hover {
-  background-color: rgba(0, 194, 203, 0.05);
+  background-color: rgba(63, 81, 181, 0.03);
 }
 
 /* Status badges */

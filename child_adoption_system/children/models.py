@@ -33,8 +33,9 @@ class Child(models.Model):
     sector = models.CharField(max_length=100, blank=True)
     district = models.CharField(max_length=100, blank=True)
     
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='available')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     description = models.TextField(blank=True)
+    admin_notes = models.TextField(blank=True, help_text="Notes from district admin review")
     photo = models.ImageField(upload_to='child_photos/', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

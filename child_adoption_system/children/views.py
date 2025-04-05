@@ -236,6 +236,15 @@ def child_create(request):
         if form.is_valid():
             child = form.save(commit=False)
             child.reported_by = user
+            
+            # Set status based on user role
+            if user.user_type == 'district_admin':
+                # District admin created children are immediately available for adoption
+                child.status = 'available'
+            else:
+                # Local leaders created children are set to pending
+                child.status = 'pending'
+                
             child.save()
             
             # Create audit log
@@ -248,10 +257,27 @@ def child_create(request):
                 reason='Created child record'
             )
             
+            # Create notification if local leader creates the child
+            if user.user_type == 'local_leader':
+                # Notify district admin
+                local_leader = LocalLeader.objects.get(user=user)
+                district_admin_user = local_leader.district_admin.user
+                Notification.objects.create(
+                    recipient=district_admin_user,
+                    sender=user,
+                    title='New Child Record',
+                    message=f'Local Leader {user.username} has created a new child record for {child.name}.',
+                    related_link=f'/children/{child.id}/'
+                )
+            
             messages.success(request, f"Child record for {child.name} created successfully.")
             return redirect('children:child_detail', pk=child.id)
     else:
-        form = ChildForm()
+        # Pre-select 'available' status for district admin
+        initial_data = {}
+        if user.user_type == 'district_admin':
+            initial_data = {'status': 'available'}
+        form = ChildForm(initial=initial_data)
     
     context = {
         'form': form,

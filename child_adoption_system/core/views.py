@@ -54,7 +54,11 @@ def admin_dashboard(request):
     # Get recent data for display
     recent_children = Child.objects.all().order_by('-created_at')[:5]
     recent_applications = AdoptionApplication.objects.all().order_by('-created_at')[:5]
-    recent_reports = Report.objects.all().order_by('-report_date')[:5]
+    
+    # Get pending reports that need review
+    pending_reports = Report.objects.filter(status='pending').order_by('-report_date')
+    recent_reports = pending_reports[:5]
+    
     upcoming_appointments = Appointment.objects.filter(
         appointment_date__gte=timezone.now(),
         status__in=['pending', 'approved']
@@ -82,6 +86,9 @@ def admin_dashboard(request):
     local_leaders_count = LocalLeader.objects.count()
     hospitals_count = Hospital.objects.count()
     
+    # Get count of pending reports
+    pending_reports_count = pending_reports.count()
+    
     # Get unread notifications
     unread_notifications = Notification.objects.filter(
         recipient=user,
@@ -92,6 +99,8 @@ def admin_dashboard(request):
         'recent_children': recent_children,
         'recent_applications': recent_applications,
         'recent_reports': recent_reports,
+        'pending_reports': pending_reports[:10],  # Show up to 10 pending reports
+        'pending_reports_count': pending_reports_count,
         'upcoming_appointments': upcoming_appointments,
         'unread_notifications': unread_notifications,
         
@@ -322,16 +331,24 @@ def adopter_dashboard(request):
     
     # Get available children for adoption
     available_children = Child.objects.filter(status='available').order_by('-created_at')[:5]
+    available_children_count = Child.objects.filter(status='available').count()
     
     # Get adoption applications for this adopter
     applications = AdoptionApplication.objects.filter(adopter=adopter).order_by('-created_at')
+    my_applications_count = applications.count()
+    recent_applications = applications[:5]
     
     # Get upcoming appointments
-    appointments = Appointment.objects.filter(
+    upcoming_appointments = Appointment.objects.filter(
         adopter=adopter,
         appointment_date__gte=timezone.now(),
         status__in=['pending', 'approved']
     ).order_by('appointment_date')[:5]
+    upcoming_appointments_count = Appointment.objects.filter(
+        adopter=adopter,
+        appointment_date__gte=timezone.now(),
+        status__in=['pending', 'approved']
+    ).count()
     
     # Get counts for dashboard widgets
     applications_count = applications.count()
@@ -355,8 +372,12 @@ def adopter_dashboard(request):
     context = {
         'adopter': adopter,
         'available_children': available_children,
+        'available_children_count': available_children_count,
         'applications': applications,
-        'appointments': appointments,
+        'my_applications_count': my_applications_count,
+        'recent_applications': recent_applications,
+        'upcoming_appointments': upcoming_appointments,
+        'upcoming_appointments_count': upcoming_appointments_count,
         'unread_notifications': unread_notifications,
         
         # Counts for dashboard widgets

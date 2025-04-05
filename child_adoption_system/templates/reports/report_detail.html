@@ -1,27 +1,47 @@
-{% extends 'dashboard_base.html' %}
-{% load static %}
-
-{% block title %}Report Details{% endblock %}
-
-{% block page_title %}Report Details{% endblock %}
-
-{% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
-<li class="breadcrumb-item"><a href="{% url 'reports:report_list' %}">Reports</a></li>
+{% extends 'dashboard_base.html' %} 
+{% load static %} 
+{% block title %}Report Details{% endblock %} {% block page_title %}Report Details{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'reports:report_list' %}">Reports</a>
+</li>
 <li class="breadcrumb-item active">Report Details</li>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container-fluid">
   <div class="row">
     <div class="col-lg-8 col-md-10 mx-auto">
       <div class="card shadow">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div
+          class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+        >
           <h5 class="mb-0">Report #{{ report.id }}</h5>
-          <span class="badge bg-{{ report.get_status_class }}">{{ report.get_status_display }}</span>
+          <span class="badge bg-{{ report.get_status_class }}"
+            >{{ report.get_status_display }}</span
+          >
         </div>
         <div class="card-body">
           <div class="row">
+            {% if messages %}
+            <div class="col-12 mb-4">
+              {% for message in messages %}
+              <div
+                class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                role="alert"
+              >
+                {{ message }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
             <div class="col-md-6 mb-3">
               <p class="mb-1 text-muted small">Reported By</p>
               <p class="fw-bold">{{ report.reported_by.get_full_name }}</p>
@@ -30,7 +50,7 @@
               <p class="mb-1 text-muted small">Date Reported</p>
               <p class="fw-bold">{{ report.report_date|date:"F d, Y" }}</p>
             </div>
-            
+
             <div class="col-12 mb-4">
               <h6 class="border-bottom pb-2 mb-3">Child Information</h6>
               <div class="row">
@@ -40,7 +60,10 @@
                 </div>
                 <div class="col-md-6 mb-3">
                   <p class="mb-1 text-muted small">Age</p>
-                  <p class="fw-bold">{{ report.child.age }} {% if report.child.age == 1 %}year{% else %}years{% endif %}</p>
+                  <p class="fw-bold">
+                    {{ report.child.age }} {% if report.child.age == 1 %}year{%
+                    else %}years{% endif %}
+                  </p>
                 </div>
                 <div class="col-md-6 mb-3">
                   <p class="mb-1 text-muted small">Gender</p>
@@ -52,35 +75,69 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="col-12 mb-4">
               <h6 class="border-bottom pb-2 mb-3">Report Details</h6>
               <p>{{ report.report_details|linebreaks }}</p>
             </div>
-            
+
             {% if report.district_admin_notes %}
             <div class="col-12 mb-4">
               <h6 class="border-bottom pb-2 mb-3">District Admin Notes</h6>
               <p>{{ report.district_admin_notes|linebreaks }}</p>
             </div>
             {% endif %}
-            
+
+            <!-- Add Review for Adoption button for district admin -->
+            {% if user.user_type == 'district_admin' and report.status != 'resolved' %}
+            <div class="card bg-light border-primary mt-4 mb-4">
+              <div class="card-body">
+                <div class="text-center">
+                  <h4 class="text-primary mb-3">
+                    <i class="fas fa-child me-2"></i>Adoption Review Required
+                  </h4>
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Admin Action Required:</strong> Review this report
+                    and decide if the child should be available for adoption.
+                  </div>
+                  <a
+                    href="{% url 'reports:review_child_adoption' report.id %}"
+                    class="btn btn-primary btn-lg w-100"
+                  >
+                    <i class="fas fa-check-circle me-2"></i> Review Child for
+                    Adoption
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
             <div class="col-12 mt-3">
-              <hr>
+              <hr />
               <div class="d-flex justify-content-between">
-                <a href="{% url 'reports:report_list' %}" class="btn btn-secondary">
+                <a
+                  href="{% url 'reports:report_list' %}"
+                  class="btn btn-secondary"
+                >
                   <i class="fas fa-arrow-left me-1"></i> Back to Reports
                 </a>
-                
+
                 <div>
                   {% if user.user_type == 'district_admin' and report.status == 'pending' %}
-                  <a href="{% url 'reports:report_update' report.id %}" class="btn btn-warning">
+                  <a
+                    href="{% url 'reports:report_update' report.id %}"
+                    class="btn btn-warning"
+                  >
                     <i class="fas fa-edit me-1"></i> Update Status
                   </a>
-                  {% endif %}
-                  
+                  {% endif %} 
                   {% if user.user_type == 'district_admin' or user.user_type == 'local_leader' or user == report.reported_by %}
-                  <a href="{% url 'reports:report_delete' report.id %}" class="btn btn-danger ms-2" onclick="return confirm('Are you sure you want to delete this report?');">
+                  <a
+                    href="{% url 'reports:report_delete' report.id %}"
+                    class="btn btn-danger ms-2"
+                    onclick="return confirm('Are you sure you want to delete this report?');"
+                  >
                     <i class="fas fa-trash me-1"></i> Delete
                   </a>
                   {% endif %}

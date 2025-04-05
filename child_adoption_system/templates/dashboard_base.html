@@ -4,9 +4,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      {% block title %}Dashboard{% endblock %} | HomeBridge
-    </title>
+    <title>{% block title %}Dashboard{% endblock %} | HomeBridge</title>
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
 
     <!-- Bootstrap CSS -->
     <link
@@ -25,9 +26,6 @@
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Dashboard CSS -->
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
 
     <!-- Additional CSS -->
     {% block extra_css %}{% endblock %}
@@ -61,18 +59,274 @@
       .nav-item.has-submenu.open .submenu-arrow {
         transform: rotate(90deg);
       }
+
+      /* Remove dots from sidebar navigation lists */
+      .nav-sidebar,
+      .nav-sidebar li {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      /* DIRECT FIX FOR SIDEBAR USER PROFILE AND TOGGLER */
+      .sidebar-toggler {
+        position: relative !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 9999 !important;
+        cursor: pointer !important;
+        color: #333 !important;
+        font-size: 1.5rem !important;
+        background: transparent !important;
+        border: none !important;
+        width: 40px !important;
+        height: 40px !important;
+        padding: 8px !important;
+        margin-right: 15px !important;
+      }
+
+      .sidebar-toggler i {
+        display: block !important;
+      }
+
+      /* Hide the user profile completely */
+      .sidebar-user {
+        display: none !important;
+        height: 0 !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .sidebar .sidebar-nav {
+        padding-top: 1rem !important;
+      }
+
+      .sidebar .nav-sidebar {
+        padding-top: 0 !important;
+      }
+
+      /* Enhanced Sidebar User Profile */
+      .sidebar-user {
+        display: block !important;
+        padding: 20px 10px !important;
+        text-align: center !important;
+        background: rgba(0, 0, 0, 0.1) !important;
+        margin-bottom: 20px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+
+      .user-profile-container {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+      }
+
+      .sidebar-user .user-avatar {
+        width: 80px !important;
+        height: 80px !important;
+        border-radius: 50% !important;
+        margin: 0 auto 15px !important;
+        border: 3px solid rgba(255, 255, 255, 0.3) !important;
+        overflow: hidden !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+
+      .sidebar-user .user-avatar img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+      }
+
+      .sidebar-user .user-avatar i {
+        font-size: 2.5rem !important;
+        color: white !important;
+      }
+
+      .sidebar-user .user-info {
+        width: 100% !important;
+      }
+
+      .sidebar-user .user-info h6 {
+        color: white !important;
+        font-weight: 700 !important;
+        margin-bottom: 5px !important;
+        font-size: 1.1rem !important;
+      }
+
+      .sidebar-user .user-role {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 0.85rem !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 20px !important;
+        padding: 3px 10px !important;
+        display: inline-block !important;
+      }
+
+      /* Fix sidebar on mobile */
+      @media (max-width: 992px) {
+        body.sidebar-mobile-visible .sidebar {
+          transform: translateX(0) !important;
+          display: block !important;
+          z-index: 1040 !important;
+          left: 0 !important;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .sidebar {
+          transform: translateX(-100%) !important;
+          transition: transform 0.3s ease !important;
+          position: fixed !important;
+          top: 70px !important;
+          bottom: 0 !important;
+          width: 280px !important;
+          overflow-y: auto !important;
+        }
+
+        body.sidebar-mobile-visible::after {
+          content: "" !important;
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          background: rgba(0, 0, 0, 0.5) !important;
+          z-index: 1030 !important;
+        }
+
+        /* Ensure topbar user dropdown is visible */
+        .topbar-nav .user-dropdown {
+          display: flex !important;
+        }
+      }
+
+      /* Force hamburger menu to be visible */
+      .sidebar-toggler {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 40px !important;
+        height: 40px !important;
+        margin-right: 15px !important;
+        cursor: pointer !important;
+        font-size: 1.5rem !important;
+        color: #333 !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        z-index: 9999 !important;
+        position: relative !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+
+      .sidebar-toggler:before,
+      .sidebar-toggler:after {
+        display: none !important;
+      }
+
+      .topbar-left {
+        display: flex !important;
+        align-items: center !important;
+      }
+
+      /* Ensure logo is visible */
+      .logo {
+        display: flex !important;
+        align-items: center !important;
+      }
+
+      .logo img {
+        height: 40px !important;
+        width: auto !important;
+      }
+
+      /* Ensure topbar user dropdown is visible */
+      .topbar-nav .user-dropdown {
+        display: flex !important;
+        align-items: center;
+      }
+
+      /* Make sure the user dropdown and menu work properly */
+      .topbar-right .dropdown-menu {
+        display: none;
+      }
+
+      .topbar-right .dropdown-menu.show {
+        display: block !important;
+      }
+
+      .topbar-right .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .topbar-right .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
     </style>
   </head>
-  <body>
+  <body class="{% block body_class %}{% endblock %}">
+    <!-- Immediately ensure correct sidebar state -->
+    <script>
+      // Force correct sidebar state on page load
+      (function () {
+        var isMobile = window.innerWidth < 992;
+        if (isMobile) {
+          // Default state is hidden on mobile
+          document.body.classList.remove("sidebar-collapsed");
+          document.body.classList.remove("sidebar-mobile-visible");
+        } else {
+          // Default state is visible on desktop
+          document.body.classList.remove("sidebar-mobile-visible");
+
+          // If user previously collapsed it, respect that
+          if (localStorage.getItem("sidebarState") === "collapsed") {
+            document.body.classList.add("sidebar-collapsed");
+          } else {
+            document.body.classList.remove("sidebar-collapsed");
+          }
+        }
+
+        // Find and remove any sidebar-user section
+        document.addEventListener("DOMContentLoaded", function () {
+          var sidebarUserElement = document.querySelector(".sidebar-user");
+          if (sidebarUserElement) {
+            console.log("Found sidebar-user element, removing it");
+            sidebarUserElement.parentNode.removeChild(sidebarUserElement);
+          }
+        });
+      })();
+    </script>
+
     <!-- Topbar -->
     <div class="topbar">
       <div class="topbar-left">
-        <button class="sidebar-toggler" id="sidebarToggler">
+        <button
+          class="sidebar-toggler"
+          id="sidebarToggler"
+          type="button"
+          aria-label="Toggle Sidebar"
+        >
           <i class="fas fa-bars"></i>
         </button>
         <a href="{% url 'dashboard:dashboard' %}" class="logo">
           <img src="{% static 'images/logo.png' %}" alt="Logo" />
-          <span>Child Adoption System</span>
+          <span>HomeBridge</span>
         </a>
       </div>
       <div class="topbar-right">
@@ -107,7 +361,7 @@
                 {{ notification.message }}
               </a>
               {% endfor %} {% else %}
-              <div class="dropdown-item">No notifications</div>
+              <div class="dropdown-item"></div>
               {% endif %}
               <div class="dropdown-divider"></div>
               <a
@@ -161,22 +415,6 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-      <div class="sidebar-user">
-        <div class="user-avatar">
-          {% if user.profile.profile_picture %}
-          <img
-            src="{{ user.profile.profile_picture.url }}"
-            alt="{{ user.username }}"
-          />
-          {% else %}
-          <i class="fas fa-user"></i>
-          {% endif %}
-        </div>
-        <div class="user-info">
-          <h6>{{ user.get_full_name|default:user.username }}</h6>
-          <div class="user-role">{{ user.get_user_type_display }}</div>
-        </div>
-      </div>
       <div class="sidebar-nav">
         <ul class="nav-sidebar">
           {% if user.user_type == 'district_admin' %}
@@ -333,7 +571,7 @@
             </a>
           </li>
 
-          <li class="nav-header">Reports</li>
+          {% comment %} <li class="nav-header">Reports</li>
           <li class="nav-item">
             <a href="{% url 'reports:report_list' %}" class="nav-link">
               <i class="fas fa-flag"></i>
@@ -357,7 +595,7 @@
               <i class="fas fa-check"></i>
               <span>Resolved Reports</span>
             </a>
-          </li>
+          </li> {% endcomment %}
 
           <li class="nav-header">System</li>
           <li class="nav-item">
@@ -381,7 +619,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'dashboard:admin_dashboard' %}" class="nav-link">
+            <a href="{% url 'audit:audit_trash' %}" class="nav-link">
               <i class="fas fa-trash"></i>
               <span>Trash</span>
             </a>
@@ -492,37 +730,64 @@
             </a>
           </li>
 
-          <li class="nav-header">Abandoned Cases</li>
+          <li class="nav-header">Reports & Cases</li>
           <li class="nav-item">
-            <a href="{% url 'reports:report_create' %}" class="nav-link">
-              <i class="fas fa-file-medical"></i>
-              <span>Report New Case</span>
+            <a
+              href="{% url 'reports:report_abandoned_child' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Report Abandoned Child</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'reports:report_list' %}" class="nav-link">
+              <i class="fas fa-list"></i>
+              <span>View Reports</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="{% url 'reports:report_list' %}" class="nav-link">
               <i class="fas fa-file-alt"></i>
-              <span>View My Reports</span>
-            </a>
-          </li>
-
-          <li class="nav-header">Children</li>
-          <li class="nav-item">
-            <a href="{% url 'children:child_create' %}" class="nav-link">
-              <i class="fas fa-baby"></i>
-              <span>Register Abandoned Child</span>
+              <span>My Reports</span>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'children:child_list' %}" class="nav-link">
-              <i class="fas fa-list"></i>
-              <span>View Reported Children</span>
+            <a
+              href="{% url 'reports:report_list' %}?status=pending"
+              class="nav-link"
+            >
+              <i class="fas fa-clock"></i>
+              <span>Pending Reports</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="{% url 'reports:report_list' %}?status=resolved"
+              class="nav-link"
+            >
+              <i class="fas fa-check-circle"></i>
+              <span>Resolved Reports</span>
             </a>
           </li>
 
           <li class="nav-header">System</li>
           <li class="nav-item">
-            <a href="{% url 'audit:audit_log_list' %}" class="nav-link">
+            <a
+              href="{% url 'notifications:notification_list' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-bell"></i>
+              <span>Notifications</span>
+              {% if notifications_count %}
+              <span class="badge bg-danger rounded-pill"
+                >{{ notifications_count }}</span
+              >
+              {% endif %}
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'audit:audit_trash' %}" class="nav-link">
               <i class="fas fa-trash"></i>
               <span>Trash</span>
             </a>
@@ -539,20 +804,6 @@
             <a href="{% url 'accounts:change_password' %}" class="nav-link">
               <i class="fas fa-key"></i>
               <span>Change Password</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              href="{% url 'notifications:notification_list' %}"
-              class="nav-link"
-            >
-              <i class="fas fa-bell"></i>
-              <span>Notifications</span>
-              {% if notifications_count %}
-              <span class="badge bg-danger rounded-pill"
-                >{{ notifications_count }}</span
-              >
-              {% endif %}
             </a>
           </li>
           <li class="nav-item">
@@ -575,7 +826,7 @@
           <li class="nav-header">Hospital Management</li>
           <li class="nav-item">
             <a href="{% url 'accounts:create_hospital' %}" class="nav-link">
-              <i class="fas fa-hospital-plus"></i>
+              <i class="fas fa-plus-square"></i>
               <span>Add Hospital</span>
             </a>
           </li>
@@ -586,19 +837,8 @@
             </a>
           </li>
 
-          <li class="nav-header">Children Management</li>
-          <li class="nav-item">
-            <a href="{% url 'children:child_list' %}" class="nav-link">
-              <i class="fas fa-child"></i>
-              <span>All Children</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="{% url 'children:child_create' %}" class="nav-link">
-              <i class="fas fa-plus-circle"></i>
-              <span>Register New Child</span>
-            </a>
-          </li>
+          {% comment %}
+          <li class="nav-header"></li>
           <li class="nav-item">
             <a
               href="{% url 'children:child_list' %}?status=available"
@@ -608,53 +848,22 @@
               <span>Available Children</span>
             </a>
           </li>
-          <li class="nav-item">
-            <a
-              href="{% url 'children:child_list' %}?status=adopted"
-              class="nav-link"
-            >
-              <i class="fas fa-home"></i>
-              <span>Adopted Children</span>
-            </a>
-          </li>
-
-          <li class="nav-header">Applications</li>
-          <li class="nav-item">
-            <a href="{% url 'children:application_list' %}" class="nav-link">
-              <i class="fas fa-file-alt"></i>
-              <span>All Applications</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              href="{% url 'children:application_list' %}?status=pending"
-              class="nav-link"
-            >
-              <i class="fas fa-spinner"></i>
-              <span>Pending Applications</span>
-            </a>
-          </li>
+          {% endcomment %}
 
           <li class="nav-header">Reports</li>
           <li class="nav-item">
-            <a href="{% url 'reports:report_create' %}" class="nav-link">
-              <i class="fas fa-file-medical"></i>
-              <span>Create Report</span>
+            <a
+              href="{% url 'reports:report_abandoned_child' %}"
+              class="nav-link"
+            >
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Report Abandoned Child</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="{% url 'reports:report_list' %}" class="nav-link">
-              <i class="fas fa-flag"></i>
-              <span>All Reports</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              href="{% url 'reports:report_list' %}?status=pending"
-              class="nav-link"
-            >
-              <i class="fas fa-exclamation-circle"></i>
-              <span>Pending Reports</span>
+              <i class="fas fa-list"></i>
+              <span>View Reports</span>
             </a>
           </li>
 
@@ -744,9 +953,7 @@
 
     <!-- Footer -->
     <div class="footer">
-      <p class="mb-0">
-        &copy; {% now "Y" %} © 2025 Cyprien_hr. HomeBridge.
-      </p>
+      <p class="mb-0">&copy; {% now "Y" %} Cyprien_hr. HomeBridge.</p>
       <p class="text-end mb-0"></p>
     </div>
 
@@ -759,6 +966,72 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
     {% block extra_js %}{% endblock %}
+
+    <!-- CRITICAL DIRECT FIX FOR SIDEBAR TOGGLE -->
+    <script>
+      // Execute immediately without waiting for DOM to fully load
+      (function () {
+        // Make sure this runs on page load
+        console.log("DIRECT FIX: Initializing sidebar toggle");
+
+        // Set up toggle button click handler
+        var setupToggler = function () {
+          var sidebarToggler = document.getElementById("sidebarToggler");
+          if (sidebarToggler) {
+            console.log("DIRECT FIX: Found sidebar toggler");
+
+            // Remove any existing event listeners
+            var newToggler = sidebarToggler.cloneNode(true);
+            sidebarToggler.parentNode.replaceChild(newToggler, sidebarToggler);
+
+            // Add new click handler
+            newToggler.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("DIRECT FIX: Sidebar toggle clicked");
+
+              var body = document.body;
+              var isMobile = window.innerWidth < 992;
+
+              if (isMobile) {
+                body.classList.toggle("sidebar-mobile-visible");
+                console.log(
+                  "DIRECT FIX: Mobile sidebar toggled",
+                  body.classList.contains("sidebar-mobile-visible")
+                );
+              } else {
+                body.classList.toggle("sidebar-collapsed");
+                console.log(
+                  "DIRECT FIX: Desktop sidebar toggled",
+                  body.classList.contains("sidebar-collapsed")
+                );
+              }
+            });
+          } else {
+            console.error(
+              "DIRECT FIX: Sidebar toggler not found - retrying in 50ms"
+            );
+            setTimeout(setupToggler, 50); // Try again if not found
+          }
+        };
+
+        // Try to initialize immediately
+        setupToggler();
+
+        // Also handle outside clicks to close sidebar on mobile
+        document.addEventListener("click", function (e) {
+          if (
+            window.innerWidth < 992 &&
+            document.body.classList.contains("sidebar-mobile-visible") &&
+            !e.target.closest(".sidebar") &&
+            !e.target.closest("#sidebarToggler")
+          ) {
+            console.log("DIRECT FIX: Closing sidebar via outside click");
+            document.body.classList.remove("sidebar-mobile-visible");
+          }
+        });
+      })();
+    </script>
 
     <!-- Ensure submenus work properly -->
     <script>

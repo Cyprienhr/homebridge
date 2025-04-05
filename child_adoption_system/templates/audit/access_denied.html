@@ -1,0 +1,51 @@
+{% extends 'dashboard_base.html' %} {% load static %} {% block title %}Access
+Denied{% endblock %} {% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-body text-center p-5">
+          <div class="mb-4">
+            <i class="fas fa-lock text-danger fa-5x"></i>
+          </div>
+          <h2 class="mb-4">Access Denied</h2>
+          <p class="lead mb-4">
+            You do not have permission to view this page. Only specific users
+            can access audit logs.
+          </p>
+
+          {% if user.user_type == 'hospital' %}
+          <p>
+            As a hospital user, you can view your own activity in the
+            <strong>Trash</strong> section directly from your dashboard instead.
+          </p>
+          <div class="mt-4">
+            <a
+              href="{% url 'dashboard:hospital_dashboard' %}"
+              class="btn btn-primary"
+            >
+              <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
+            </a>
+          </div>
+          {% elif user.user_type == 'adopter' %}
+          <div class="mt-4">
+            <a
+              href="{% url 'dashboard:adopter_dashboard' %}"
+              class="btn btn-primary"
+            >
+              <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
+            </a>
+          </div>
+          {% else %}
+          <div class="mt-4">
+            <a href="{% url 'dashboard:dashboard' %}" class="btn btn-primary">
+              <i class="fas fa-arrow-left me-2"></i>Return to Dashboard
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,7 +1,229 @@
 {% extends 'dashboard_base.html' %} {% load static %} {% block title %}Adopter
 Dashboard{% endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/adopter_dashboard.css' %}" />
-{% endblock %} {% block page_title %}Adopter Dashboard{% endblock %} {% block breadcrumb %}
+<style>
+  body.adopter-dashboard {
+    background-color: white !important;
+  }
+
+  .sidebar {
+    background: linear-gradient(to bottom, #3f51b5, #303f9f) !important;
+  }
+
+  .nav-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .nav-sidebar .nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-left: 3px solid #ffffff !important;
+  }
+
+  .nav-sidebar .nav-link.active {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-left: 3px solid #ffffff !important;
+  }
+
+  .stat-card,
+  .card {
+    background-color: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .card-header,
+  .table thead th {
+    background-color: white !important;
+    border-bottom: 1px solid rgba(63, 81, 181, 0.1) !important;
+  }
+
+  .card-header h5,
+  .card-body,
+  .welcome-banner h4,
+  .stat-details h3 {
+    color: #212121 !important;
+  }
+
+  .welcome-banner p,
+  .stat-details p {
+    color: #757575 !important;
+  }
+
+  .table {
+    color: #212121 !important;
+  }
+
+  .table tbody tr:hover {
+    background-color: rgba(63, 81, 181, 0.03) !important;
+  }
+
+  /* Fix visibility issues */
+  .stat-details h3 {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    color: #212121 !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .data-value,
+  .stat-details .data-value {
+    color: #212121 !important;
+    font-weight: 700 !important;
+  }
+
+  .card-body {
+    color: #212121 !important;
+  }
+
+  .table td,
+  .table th {
+    color: #212121 !important;
+  }
+
+  .text-muted {
+    color: #757575 !important;
+  }
+
+  .fw-bold {
+    color: #212121 !important;
+  }
+
+  .bg-warning span {
+    color: #212121 !important;
+  }
+
+  .bg-success span,
+  .bg-danger span,
+  .bg-info span {
+    color: white !important;
+  }
+
+  .stat-icon {
+    background-color: #3f51b5 !important;
+    color: white !important;
+  }
+
+  .bg-success {
+    background-color: #4caf50 !important;
+  }
+
+  .bg-info {
+    background-color: #3498db !important;
+  }
+
+  /* Fix notification visibility */
+  .notification-list {
+    padding: 0;
+  }
+
+  /* New stats card styling */
+  body .stat-card {
+    background-color: white !important;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    height: 100%;
+    overflow: hidden;
+    display: block !important;
+    padding: 0 !important;
+    border-left: none !important;
+  }
+
+  body .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  body .stat-card .stats-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  body .stat-card .data-label {
+    color: var(--text-dark) !important;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  body .stat-card .data-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark) !important;
+    line-height: 1.2;
+  }
+
+  body .stat-card .card-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem !important;
+  }
+
+  body .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    color: var(--white);
+    margin-right: 0 !important;
+    margin-left: 10px !important;
+  }
+
+  .notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: flex-start;
+    background-color: white;
+  }
+
+  .notification-item.unread {
+    background-color: rgba(63, 81, 181, 0.05);
+  }
+
+  .notification-icon {
+    margin-right: 1rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #3f51b5;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .notification-content {
+    flex: 1;
+  }
+
+  .notification-content h6 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #212121 !important;
+  }
+
+  .notification-content p {
+    margin-bottom: 0.25rem;
+    color: #212121 !important;
+  }
+
+  .notification-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+  }
+</style>
+{% endblock %} {% block body_class %}adopter-dashboard{% endblock %} {% block page_title %}Adopter Dashboard{% endblock %} {% block breadcrumb %}
 <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
 {% endblock %} {% block content %}
 <div class="content-body">
@@ -52,38 +274,56 @@ Dashboard{% endblock %} {% block extra_css %}
   </div>
 
   <!-- Dashboard Stats -->
-  <div class="dashboard-stats">
+  <div class="dashboard-stats mb-4">
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-4 mb-4">
         <div class="stat-card">
-          <div class="stat-icon bg-primary">
-            <i class="fas fa-child"></i>
-          </div>
-          <div class="stat-details">
-            <h3>{{ available_children_count }}</h3>
-            <p>Available Children</p>
+          <div
+            class="card-body d-flex align-items-center justify-content-between p-3"
+          >
+            <div class="stats-info">
+              <div class="data-label">Available Children</div>
+              <div class="data-value">
+                {{ available_children_count|default:'0' }}
+              </div>
+            </div>
+            <div class="stat-icon bg-primary">
+              <i class="fas fa-child"></i>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4 mb-4">
         <div class="stat-card">
-          <div class="stat-icon bg-success">
-            <i class="fas fa-file-alt"></i>
-          </div>
-          <div class="stat-details">
-            <h3>{{ my_applications_count }}</h3>
-            <p>My Applications</p>
+          <div
+            class="card-body d-flex align-items-center justify-content-between p-3"
+          >
+            <div class="stats-info">
+              <div class="data-label">My Applications</div>
+              <div class="data-value">
+                {{ my_applications_count|default:'0' }}
+              </div>
+            </div>
+            <div class="stat-icon bg-success">
+              <i class="fas fa-file-alt"></i>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4 mb-4">
         <div class="stat-card">
-          <div class="stat-icon bg-info">
-            <i class="fas fa-calendar-check"></i>
-          </div>
-          <div class="stat-details">
-            <h3>{{ upcoming_appointments_count }}</h3>
-            <p>Upcoming Appointments</p>
+          <div
+            class="card-body d-flex align-items-center justify-content-between p-3"
+          >
+            <div class="stats-info">
+              <div class="data-label">Upcoming Appointments</div>
+              <div class="data-value">
+                {{ upcoming_appointments_count|default:'0' }}
+              </div>
+            </div>
+            <div class="stat-icon bg-info">
+              <i class="fas fa-calendar-check"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -143,11 +383,12 @@ Dashboard{% endblock %} {% block extra_css %}
                       {% endif %}
                       <div>
                         <div class="fw-bold">{{ application.child.name }}</div>
-                        <small class="text-muted"
-                          >{{ application.child.gender|title }}, {{
-                          application.child.date_of_birth|timesince }}
-                          old</small
-                        >
+                        {% comment %}
+                        <small class="text-muted">
+                          {{ application.child.gender|title }}, {{
+                          application.child.date_of_birth|timesince }} old
+                        </small>
+                        {% endcomment %}
                       </div>
                     </div>
                   </td>
@@ -294,9 +535,11 @@ Dashboard{% endblock %} {% block extra_css %}
           {% else %}
           <div class="text-center py-4">
             <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+            {% comment %}
             <p class="lead text-muted">
               You don't have any upcoming appointments.
             </p>
+            {% endcomment %}
           </div>
           {% endif %}
         </div>

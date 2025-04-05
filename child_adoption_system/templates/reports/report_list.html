@@ -44,10 +44,9 @@
                 <label for="status" class="form-label">Status</label>
                 <select name="status" id="status" class="form-select">
                     <option value="">All Status</option>
-                    <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
-                    <option value="INVESTIGATING" {% if request.GET.status == 'INVESTIGATING' %}selected{% endif %}>Under Investigation</option>
-                    <option value="RESOLVED" {% if request.GET.status == 'RESOLVED' %}selected{% endif %}>Resolved</option>
-                    <option value="CLOSED" {% if request.GET.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="reviewed" {% if status_filter == 'reviewed' %}selected{% endif %}>Reviewed</option>
+                    <option value="resolved" {% if status_filter == 'resolved' %}selected{% endif %}>Resolved</option>
                 </select>
             </div>
             <div class="col-md-3">
@@ -86,26 +85,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for report in reports %}
+                    {% for report in page_obj %}
                     <tr>
-                        <td>{{ report.date_reported|date:"M d, Y" }}</td>
+                        <td>{{ report.report_date|date:"M d, Y" }}</td>
                         <td>
                             {% if report.child %}
-                            {{ report.child.first_name }} {{ report.child.last_name }}
+                            {{ report.child.name }}
                             {% else %}
-                            {{ report.child_name|default:"Unknown" }}
+                            Unknown
                             {% endif %}
                         </td>
                         <td>
                             {% if report.reported_by %}
-                            {{ report.reported_by.get_full_name }}
+                            {{ report.reported_by.get_full_name|default:report.reported_by.username }}
                             {% else %}
-                            {{ report.reporter_name|default:"Anonymous" }}
+                            Anonymous
                             {% endif %}
                         </td>
-                        <td>{{ report.get_report_type_display }}</td>
+                        <td>{{ report.child.get_found_location_type_display }}</td>
                         <td>
-                            <span class="status-badge {{ report.status|lower }}">
+                            <span class="status-badge {% if report.status == 'pending' %}pending{% elif report.status == 'reviewed' %}warning{% elif report.status == 'resolved' %}success{% endif %}">
                                 {{ report.get_status_display }}
                             </span>
                         </td>
@@ -114,14 +113,16 @@
                                 <a href="{% url 'reports:report_detail' report.id %}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                {% if report.status != 'RESOLVED' and report.status != 'CLOSED' %}
-                                <a href="{% url 'reports:report_update' report.id %}" class="btn btn-sm btn-success">
-                                    <i class="fas fa-check"></i>
+                                {% if report.status == 'pending' %}
+                                <a href="{% url 'reports:review_child_adoption' report.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-check-circle"></i> Review
                                 </a>
                                 {% endif %}
+                                {% if user.user_type == 'district_admin' %}
                                 <a href="{% url 'reports:report_delete' report.id %}" class="btn btn-sm btn-danger">
                                     <i class="fas fa-trash"></i>
                                 </a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

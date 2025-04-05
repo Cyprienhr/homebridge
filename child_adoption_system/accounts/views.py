@@ -675,7 +675,7 @@ def edit_hospital(request, pk):
             return redirect('accounts:hospital_list')
     
     if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST, instance=hospital.user)
+        user_form = UserProfileForm(request.POST, instance=hospital.user)
         hospital_form = HospitalForm(request.POST, instance=hospital)
         
         if user_form.is_valid() and hospital_form.is_valid():
@@ -698,7 +698,7 @@ def edit_hospital(request, pk):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        user_form = UserRegistrationForm(instance=hospital.user)
+        user_form = UserProfileForm(instance=hospital.user)
         hospital_form = HospitalForm(instance=hospital)
     
     context = {

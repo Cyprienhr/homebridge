@@ -1,6 +1,7 @@
-{% extends 'dashboard_base.html' %} 
-{% load static %} 
-{% block title %}District Admin Dashboard{% endblock %} {% block page_title %}District Admin Dashboard{% endblock %} {% block breadcrumb %}
+{% extends 'dashboard_base.html' %} {% load static %} {% block title %}District
+Admin Dashboard{% endblock %} {% block body_class %}district-admin-dashboard{%
+endblock %} {% block page_title %}District Admin Dashboard{% endblock %} {%
+block breadcrumb %}
 <li class="breadcrumb-item active">Dashboard</li>
 {% endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/district_admin_dashboard.css' %}" />
@@ -9,20 +10,15 @@
 <div class="row mb-4">
   <div class="col-xl-3 col-md-6 mb-4">
     <div class="data-card">
-      <div class="card-header">
-        <h6 class="m-0">Total Children</h6>
-      </div>
-      <div class="card-body">
-        <div class="row align-items-center">
-          <div class="col-3">
-            <div class="data-icon">
-              <i class="fas fa-child"></i>
-            </div>
-          </div>
-          <div class="col-9 text-end">
-            <div class="data-value">{{ children_count }}</div>
-            <div class="data-label"></div>
-          </div>
+      <div
+        class="card-body d-flex align-items-center justify-content-between p-3"
+      >
+        <div class="stats-info">
+          <div class="data-label">Total Children</div>
+          <div class="data-value">{{ children_count }}</div>
+        </div>
+        <div class="data-icon">
+          <i class="fas fa-child"></i>
         </div>
       </div>
     </div>
@@ -30,20 +26,15 @@
 
   <div class="col-xl-3 col-md-6 mb-4">
     <div class="data-card">
-      <div class="card-header">
-        <h6 class="m-0">Applications</h6>
-      </div>
-      <div class="card-body">
-        <div class="row align-items-center">
-          <div class="col-3">
-            <div class="data-icon">
-              <i class="fas fa-file-alt"></i>
-            </div>
-          </div>
-          <div class="col-9 text-end">
-            <div class="data-value">{{ applications_count }}</div>
-            <div class="data-label"></div>
-          </div>
+      <div
+        class="card-body d-flex align-items-center justify-content-between p-3"
+      >
+        <div class="stats-info">
+          <div class="data-label">Applications</div>
+          <div class="data-value">{{ applications_count }}</div>
+        </div>
+        <div class="data-icon">
+          <i class="fas fa-file-alt"></i>
         </div>
       </div>
     </div>
@@ -51,20 +42,15 @@
 
   <div class="col-xl-3 col-md-6 mb-4">
     <div class="data-card">
-      <div class="card-header">
-        <h6 class="m-0">Appointments</h6>
-      </div>
-      <div class="card-body">
-        <div class="row align-items-center">
-          <div class="col-3">
-            <div class="data-icon">
-              <i class="fas fa-calendar-check"></i>
-            </div>
-          </div>
-          <div class="col-9 text-end">
-            <div class="data-value">{{ appointments_count }}</div>
-            <div class="data-label"></div>
-          </div>
+      <div
+        class="card-body d-flex align-items-center justify-content-between p-3"
+      >
+        <div class="stats-info">
+          <div class="data-label">Appointments</div>
+          <div class="data-value">{{ appointments_count }}</div>
+        </div>
+        <div class="data-icon">
+          <i class="fas fa-calendar-check"></i>
         </div>
       </div>
     </div>
@@ -72,25 +58,155 @@
 
   <div class="col-xl-3 col-md-6 mb-4">
     <div class="data-card">
-      <div class="card-header">
-        <h6 class="m-0">Users</h6>
+      <div
+        class="card-body d-flex align-items-center justify-content-between p-3"
+      >
+        <div class="stats-info">
+          <div class="data-label">Users</div>
+          <div class="data-value">{{ users_count }}</div>
+        </div>
+        <div class="data-icon">
+          <i class="fas fa-users"></i>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
+
+{% comment %}
+<!-- Abandoned Children Approval Panel -->
+{% if pending_reports_count > 0 %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card bg-light border-primary">
       <div class="card-body">
         <div class="row align-items-center">
-          <div class="col-3">
-            <div class="data-icon">
-              <i class="fas fa-users"></i>
-            </div>
+          <div class="col-md-8">
+            <h4 class="text-primary mb-2">
+              <i class="fas fa-exclamation-circle me-2"></i> Abandoned Children
+              Needing Your Review
+            </h4>
+            <p class="mb-0">
+              <strong>{{ pending_reports_count }} pending reports</strong> from
+              hospitals and local leaders need your approval to make children
+              available for adoption. As a District Administrator, you need to
+              review these reports and decide which children should be made
+              visible to potential adopters.
+            </p>
           </div>
-          <div class="col-9 text-end">
-            <div class="data-value">{{ users_count }}</div>
-            <div class="data-label"></div>
+          <div class="col-md-4 text-end">
+            <a
+              href="{% url 'reports:report_list' %}?status=pending"
+              class="btn btn-primary btn-lg"
+            >
+              <i class="fas fa-clipboard-check me-2"></i> Review Pending Reports
+            </a>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+{% endif %}
+
+<!-- Pending Reports Section -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-warning">
+      <div
+        class="card-header bg-warning text-dark d-flex justify-content-between align-items-center"
+      >
+        <h5 class="mb-0">
+          <i class="fas fa-exclamation-circle me-2"></i>Pending Abandoned Child
+          Reports
+        </h5>
+        <div>
+          <span class="badge bg-dark fs-6 me-2"
+            >{{ pending_reports_count }} Pending</span
+          >
+          <a
+            href="{% url 'children:child_create' %}"
+            class="btn btn-sm btn-success me-2"
+          >
+            <i class="fas fa-plus-circle me-1"></i> Add Child for Adoption
+          </a>
+          <a
+            href="{% url 'reports:report_list' %}?status=pending"
+            class="btn btn-sm btn-dark"
+          >
+            <i class="fas fa-list me-1"></i> View All Pending Reports
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        {% if pending_reports %}
+        <div class="alert alert-info mb-3">
+          <strong>Action Required:</strong> These reports need your review to
+          determine if the children should be made available for adoption. Click
+          "Review" to evaluate each case and update the child's status.
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Report Date</th>
+                <th>Child Name</th>
+                <th>Reported By</th>
+                <th>Found At</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for report in pending_reports %}
+              <tr>
+                <td>{{ report.report_date|date:"M d, Y" }}</td>
+                <td>{{ report.child.name }}</td>
+                <td>
+                  {{
+                  report.reported_by.get_full_name|default:report.reported_by.username
+                  }} {% if report.reported_by.user_type == 'hospital' %}
+                  <span class="badge bg-info">Hospital</span>
+                  {% elif report.reported_by.user_type == 'local_leader' %}
+                  <span class="badge bg-primary">Local Leader</span>
+                  {% endif %}
+                </td>
+                <td>{{ report.child.get_found_location_type_display }}</td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <a
+                      href="{% url 'reports:report_detail' report.id %}"
+                      class="btn btn-sm btn-info"
+                    >
+                      <i class="fas fa-eye"></i> View
+                    </a>
+                    <a
+                      href="{% url 'reports:review_child_adoption' report.id %}"
+                      class="btn btn-sm btn-primary"
+                    >
+                      <i class="fas fa-check-circle"></i> Review
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-3">
+          <i class="fas fa-clipboard-check fa-4x text-muted mb-3"></i>
+          <h5>No Pending Reports</h5>
+          <p class="text-muted">
+            There are no pending abandoned child reports that need your review
+            at the moment.
+          </p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endcomment %}
 
 <!-- Charts and Recent Activities -->
 <div class="row mb-4">

@@ -148,7 +148,7 @@ def appointment_create(request):
             )
             
             messages.success(request, "Appointment created successfully.")
-            return redirect('appointment_detail', pk=appointment.id)
+            return redirect('appointments:appointment_detail', pk=appointment.id)
     else:
         form = AppointmentForm(application_id=application_id)
     
@@ -219,7 +219,7 @@ def appointment_update(request, pk):
             )
             
             messages.success(request, "Appointment updated successfully.")
-            return redirect('appointment_detail', pk=appointment.id)
+            return redirect('appointments:appointment_detail', pk=appointment.id)
     else:
         form = AppointmentUpdateForm(instance=appointment)
     
@@ -244,7 +244,7 @@ def appointment_cancel(request, pk):
         adopter = Adopter.objects.get(user=user)
         if appointment.adopter != adopter:
             messages.error(request, "You do not have permission to cancel this appointment.")
-            return redirect('appointment_list')
+            return redirect('appointments:appointment_list')
     else:
         # Local leaders and hospitals cannot cancel appointments
         messages.error(request, "You do not have permission to cancel appointments.")
@@ -296,6 +296,6 @@ def appointment_cancel(request, pk):
             )
         
         messages.success(request, "Appointment cancelled successfully.")
-        return redirect('appointment_list')
+        return redirect('appointments:appointment_list')
     
     return render(request, 'appointments/appointment_cancel.html', {'appointment': appointment})

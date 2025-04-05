@@ -1,0 +1,368 @@
+{% extends 'dashboard_base.html' %} 
+{% load static %} 
+{% load crispy_forms_tags %} {% block title %}Review Child Report{% endblock %} {% block page_title %}Review Abandoned Child Report{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'reports:report_list' %}">Reports</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'reports:report_detail' report.id %}"
+    >Report #{{ report.id }}</a
+  >
+</li>
+<li class="breadcrumb-item active">Review for Adoption</li>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Child Information -->
+    <div class="col-lg-4 col-md-12 mb-4">
+      <div class="card shadow h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Child Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            {% if child.photo %}
+            <img
+              src="{{ child.photo.url }}"
+              alt="{{ child.name }}"
+              class="img-fluid rounded-circle child-photo mb-3"
+              style="width: 150px; height: 150px; object-fit: cover"
+            />
+            {% else %}
+            <div
+              class="avatar-placeholder mx-auto mb-3"
+              style="width: 150px; height: 150px; font-size: 3rem"
+            >
+              <i class="fas fa-child"></i>
+            </div>
+            {% endif %}
+            <h4>{{ child.name }}</h4>
+            <div class="mb-2">
+              <span
+                class="badge {% if child.status == 'available' %}bg-success{% elif child.status == 'pending' %}bg-warning{% else %}bg-primary{% endif %}"
+              >
+                {{ child.get_status_display }}
+              </span>
+            </div>
+          </div>
+
+          <div class="child-details">
+            <div class="info-item">
+              <strong>Gender:</strong> {{ child.get_gender_display }}
+            </div>
+            <div class="info-item">
+              <strong>Date of Birth:</strong> {{ child.date_of_birth|date:"M d,
+              Y" }}
+            </div>
+            <div class="info-item">
+              <strong>Abandonment Date:</strong> {{
+              child.abandonment_date|date:"M d, Y" }}
+            </div>
+            <div class="info-item">
+              <strong>Found At:</strong> {{
+              child.get_found_location_type_display }}
+            </div>
+            {% if child.found_location_type == 'street' %}
+            <div class="info-item">
+              <strong>Location Details:</strong> {{ child.village }}, {{
+              child.cell }}, {{ child.sector }}, {{ child.district }}
+            </div>
+            {% endif %} {% if child.found_location_type == 'hospital' %}
+            <div class="info-item">
+              <strong>Hospital:</strong> {% if child.hospital %}{{
+              child.hospital.hospital_name }}{% else %}Not specified{% endif %}
+            </div>
+            {% endif %}
+            <div class="info-item">
+              <strong>Reported By:</strong> {{
+              report.reported_by.get_full_name|default:report.reported_by.username
+              }} ({{ report.reported_by.get_user_type_display }})
+            </div>
+            <div class="info-item">
+              <strong>Report Date:</strong> {{ report.report_date|date:"M d, Y"
+              }}
+            </div>
+            <div class="info-item">
+              <strong>Description:</strong>
+              <p class="text-muted">{{ child.description|linebreaks }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Review Form -->
+    <div class="col-lg-8 col-md-12 mb-4">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Review for Adoption</h5>
+          <p class="mb-0 small">
+            Approve or keep this child pending for adoption
+          </p>
+        </div>
+        <div class="card-body">
+          <div class="report-details mb-4">
+            <h5 class="form-section-title">Original Report Details</h5>
+            <p>{{ report.report_details|linebreaks }}</p>
+          </div>
+
+          {% if messages %}
+          <div class="messages mb-4">
+            {% for message in messages %}
+            <div
+              class="alert alert-{{ message.tags }} alert-dismissible fade show"
+              role="alert"
+            >
+              {{ message }}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form method="post" id="adoption-review-form">
+            {% csrf_token %}
+
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <h5 class="form-section-title">Adoption Status Decision</h5>
+                <div class="alert alert-warning">
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                  <strong>Important:</strong> As a District Administrator, your
+                  decision will determine if this child becomes visible to
+                  potential adopters.
+                </div>
+              </div>
+
+              {% if approval_form.non_field_errors %}
+              <div class="col-12 mb-3">
+                <div class="alert alert-danger">
+                  {{ approval_form.non_field_errors }}
+                </div>
+              </div>
+              {% endif %}
+
+              <div class="col-md-6 mb-3">
+                <div class="card border-primary h-100">
+                  <div class="card-body">
+                    <h6 class="card-title text-primary">Adoption Status</h6>
+                    {{ approval_form.status|as_crispy_field }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12 mb-3">
+                <div class="card border-info">
+                  <div class="card-body">
+                    <h6 class="card-title text-info">
+                      Admin Notes (Required for approval)
+                    </h6>
+                    <p class="small text-muted mb-2">
+                      Please provide detailed notes about why this child should
+                      be made available for adoption. These notes will be used
+                      for record-keeping purposes.
+                    </p>
+                    {{ approval_form.admin_notes|as_crispy_field }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12 mb-3">
+                <h5 class="form-section-title">Report Status Update</h5>
+                <div class="alert alert-warning">
+                  <i class="fas fa-exclamation-circle me-2"></i>
+                  <strong>Important:</strong> If you select "Make Available for
+                  Adoption" above, the report will automatically be marked as
+                  "Resolved" and the child will be visible to adopters. This
+                  report status selection below is only used when keeping a
+                  child as "Pending".
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                {{ report_form.status|as_crispy_field }}
+                <input
+                  type="hidden"
+                  name="status-identifier"
+                  value="report-status"
+                />
+              </div>
+
+              <div class="col-md-12 mb-3">
+                {{ report_form.district_admin_notes|as_crispy_field }}
+              </div>
+
+              <div class="col-12 mt-4">
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle me-2"></i>
+                  <strong>Note:</strong> Making a child available for adoption
+                  will allow potential adopters to see and apply to adopt this
+                  child.
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <a
+                href="{% url 'reports:report_detail' report.id %}"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-arrow-left me-1"></i> Back to Report
+              </a>
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-check-circle me-1"></i> Submit Review
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("adoption-review-form");
+    const submitButton = form.querySelector('button[type="submit"]');
+    const childStatusSelect = document.getElementById("id_status");
+    const statusIdentifier = document.querySelector(
+      'input[name="status-identifier"]'
+    );
+    const reportStatusSection = statusIdentifier
+      ? statusIdentifier.closest(".col-md-6.mb-3")
+      : null;
+    const reportStatusAlert = document.querySelector(".alert-warning");
+
+    // Function to toggle report status field visibility
+    function toggleReportStatusVisibility() {
+      if (!reportStatusSection) return;
+
+      if (childStatusSelect.value === "available") {
+        // Create a visible label showing the report will be set to resolved
+        let resolvedLabel = document.getElementById("auto-resolved-label");
+
+        if (!resolvedLabel) {
+          resolvedLabel = document.createElement("div");
+          resolvedLabel.className = "alert alert-success mt-2";
+          resolvedLabel.id = "auto-resolved-label";
+          reportStatusSection.appendChild(resolvedLabel);
+        }
+
+        // Update the label text and make it very visible
+        resolvedLabel.innerHTML =
+          '<i class="fas fa-check-circle me-2"></i><strong>Auto-set to "Resolved"</strong> - When you make a child available for adoption, the report status is automatically set to "Resolved"';
+
+        // Hide the select field
+        const selectField = reportStatusSection.querySelector("select");
+        if (selectField) {
+          selectField.style.display = "none";
+        }
+
+        // Make sure label is visible
+        resolvedLabel.style.display = "block";
+
+        // Update the alert message
+        if (reportStatusAlert) {
+          reportStatusAlert.className = "alert alert-primary";
+          reportStatusAlert.innerHTML =
+            '<i class="fas fa-info-circle me-2"></i><strong>Important:</strong> You have selected to make this child available for adoption. When you submit, the child will be visible to potential adopters, and the report will automatically be marked as "Resolved".';
+        }
+      } else {
+        // Find the resolved label if it exists
+        const resolvedLabel = document.getElementById("auto-resolved-label");
+
+        // Hide the label
+        if (resolvedLabel) {
+          resolvedLabel.style.display = "none";
+        }
+
+        // Show the select field
+        const selectField = reportStatusSection.querySelector("select");
+        if (selectField) {
+          selectField.style.display = "block";
+        }
+
+        // Reset the alert
+        if (reportStatusAlert) {
+          reportStatusAlert.className = "alert alert-warning";
+          reportStatusAlert.innerHTML =
+            '<i class="fas fa-exclamation-circle me-2"></i><strong>Important:</strong> If you select "Make Available for Adoption" above, the report will automatically be marked as "Resolved" and the child will be visible to adopters. This report status selection is only used when keeping a child as "Pending".';
+        }
+      }
+    }
+
+    // Run when page loads
+    toggleReportStatusVisibility();
+
+    // Run when child status changes
+    childStatusSelect.addEventListener("change", toggleReportStatusVisibility);
+
+    // Prevent double submission
+    form.addEventListener("submit", function (e) {
+      if (form.classList.contains("submitting")) {
+        e.preventDefault();
+        return false;
+      }
+
+      form.classList.add("submitting");
+      submitButton.innerHTML =
+        '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+      submitButton.disabled = true;
+
+      // For available children, ensure we pass a hidden field with resolved status
+      if (childStatusSelect.value === "available") {
+        // Create hidden field to ensure report status is set to resolved
+        const hiddenField = document.createElement("input");
+        hiddenField.type = "hidden";
+        hiddenField.name = "force_resolved";
+        hiddenField.value = "true";
+        form.appendChild(hiddenField);
+      }
+
+      return true;
+    });
+  });
+</script>
+{% endblock %} {% block extra_css %}
+<style>
+  .form-section-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  .child-details .info-item {
+    margin-bottom: 0.75rem;
+  }
+
+  .child-photo {
+    border: 3px solid var(--primary-color);
+  }
+
+  .avatar-placeholder {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .report-details {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--primary-color);
+  }
+</style>
+{% endblock %}

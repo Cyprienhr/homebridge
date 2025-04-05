@@ -11,15 +11,16 @@ class AuditLogListView(ListView):
     model = AuditLog
     template_name = 'audit/trash_list.html'
     context_object_name = 'audit_logs'
+    paginate_by = 20
 
     def get_queryset(self):
         user = self.request.user
         if user.user_type == 'district_admin':
-            return AuditLog.objects.all()
+            return AuditLog.objects.all().order_by('-created_at')
         elif user.user_type == 'local_leader':
-            return AuditLog.objects.filter(user__local_leader_profile__district_admin=user.district_admin_profile)
+            return AuditLog.objects.filter(user__local_leader_profile__district_admin=user.district_admin_profile).order_by('-created_at')
         elif user.user_type == 'hospital':
-            return AuditLog.objects.filter(user=user)
+            return AuditLog.objects.filter(user=user).order_by('-created_at')
         return AuditLog.objects.none()
 
 @login_required

@@ -41,7 +41,8 @@ class ChildForm(forms.ModelForm):
     )
     status = forms.ChoiceField(
         choices=Child.STATUS_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        help_text="'Available' means this child will be immediately visible for adoption. 'Pending' means the child's details will be reviewed first."
     )
     description = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description', 'rows': 3}),
@@ -68,11 +69,20 @@ class ChildForm(forms.ModelForm):
         # Filter hospitals based on user type
         if user and user.user_type == 'local_leader':
             self.fields['hospital'].queryset = Hospital.objects.filter(local_leader__user=user)
+            # Local leader can only create pending children
+            self.fields['status'].choices = [
+                ('pending', 'Pending')
+            ]
+            self.fields['status'].initial = 'pending'
+            self.fields['status'].help_text = "As a Local Leader, reported children will be automatically set to 'Pending' for District Admin review."
         elif user and user.user_type == 'district_admin':
             # District admin can see all hospitals in their district
             self.fields['hospital'].queryset = Hospital.objects.filter(
                 local_leader__district_admin__user=user
             )
+            # Allow full status control
+            self.fields['status'].initial = 'available'
+            self.fields['status'].help_text = "As a District Admin, you can directly make children 'Available' for adoption."
 
     def clean(self):
         cleaned_data = super().clean()

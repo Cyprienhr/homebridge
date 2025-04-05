@@ -1,8 +1,26 @@
-{% extends 'dashboard_base.html' %} 
-{% load static %} {% block title %}Local Leader Dashboard{% endblock %} {% block page_title %}Local Leader Dashboard{% endblock %} {% block breadcrumb %}
-<li class="breadcrumb-item active">Dashboard</li>
-{% endblock %} {% block extra_css %}
+{% extends 'dashboard_base.html' %} {% load static %} {% block title %}Local
+Leader Dashboard{% endblock %} {% block body_class %}local-leader-dashboard{%
+endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/local_leader_dashboard.css' %}" />
+<style>
+  /* Override notification styles to ensure visibility */
+  .notification-icon {
+    color: #000000 !important;
+  }
+  .notification-icon i {
+    color: #000000 !important;
+  }
+  .notification-message {
+    color: #000000 !important;
+    font-weight: 500 !important;
+  }
+  .notification-time {
+    color: #333333 !important;
+  }
+</style>
+{% endblock %} {% block page_title %}Local Leader Dashboard{% endblock %} {%
+block breadcrumb %}
+<li class="breadcrumb-item active">Dashboard</li>
 {% endblock %} {% block content %}
 <div class="container-fluid py-4">
   <!-- Welcome Header -->
@@ -21,10 +39,10 @@
                 abandoned cases, and monitor notifications.
               </p>
             </div>
-            <div class="ms-auto">
+            <div class="ms-auto d-flex">
               <a
                 href="{% url 'accounts:create_hospital' %}"
-                class="btn btn-primary"
+                class="btn btn-primary me-2"
               >
                 <i class="fas fa-plus-circle me-2"></i>Add Hospital
               </a>
@@ -39,20 +57,16 @@
   <div class="row mb-4">
     <div class="col-xl-3 col-md-6 mb-4">
       <div class="data-card">
-        <div class="card-header">
-          <h6 class="m-0">Hospitals</h6>
-        </div>
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-3">
-              <div class="data-icon">
-                <i class="fas fa-hospital"></i>
-              </div>
-            </div>
-            <div class="col-9 text-end">
-              <div class="data-value">{{ hospitals_count|default:0 }}</div>
-              <div class="data-label">In your area</div>
-            </div>
+        <div
+          class="card-body d-flex align-items-center justify-content-between p-3"
+        >
+          <div class="stats-info">
+            <div class="data-label">Hospitals</div>
+            <div class="data-value">{{ hospitals_count|default:0 }}</div>
+            <div class="data-sublabel">In your area</div>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-hospital"></i>
           </div>
         </div>
       </div>
@@ -60,20 +74,16 @@
 
     <div class="col-xl-3 col-md-6 mb-4">
       <div class="data-card">
-        <div class="card-header">
-          <h6 class="m-0">Abandoned Cases</h6>
-        </div>
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-3">
-              <div class="data-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-            </div>
-            <div class="col-9 text-end">
-              <div class="data-value">{{ reports_count|default:0 }}</div>
-              <div class="data-label">Active reports</div>
-            </div>
+        <div
+          class="card-body d-flex align-items-center justify-content-between p-3"
+        >
+          <div class="stats-info">
+            <div class="data-label">Abandoned Cases</div>
+            <div class="data-value">{{ reports_count|default:0 }}</div>
+            <div class="data-sublabel">Active reports</div>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-exclamation-triangle"></i>
           </div>
         </div>
       </div>
@@ -81,22 +91,18 @@
 
     <div class="col-xl-3 col-md-6 mb-4">
       <div class="data-card">
-        <div class="card-header">
-          <h6 class="m-0">Notifications</h6>
-        </div>
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-3">
-              <div class="data-icon">
-                <i class="fas fa-bell"></i>
-              </div>
+        <div
+          class="card-body d-flex align-items-center justify-content-between p-3"
+        >
+          <div class="stats-info">
+            <div class="data-label">Notifications</div>
+            <div class="data-value">
+              {{ unread_notifications|length|default:0 }}
             </div>
-            <div class="col-9 text-end">
-              <div class="data-value">
-                {{ unread_notifications|length|default:0 }}
-              </div>
-              <div class="data-label">Unread</div>
-            </div>
+            <div class="data-sublabel">Unread</div>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-bell"></i>
           </div>
         </div>
       </div>
@@ -104,25 +110,125 @@
 
     <div class="col-xl-3 col-md-6 mb-4">
       <div class="data-card">
-        <div class="card-header">
-          <h6 class="m-0">Deleted Items</h6>
-        </div>
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-3">
-              <div class="data-icon">
-                <i class="fas fa-trash"></i>
-              </div>
-            </div>
-            <div class="col-9 text-end">
-              <div class="data-value">{{ deleted_items_count|default:0 }}</div>
-              <div class="data-label">In trash</div>
-            </div>
+        <div
+          class="card-body d-flex align-items-center justify-content-between p-3"
+        >
+          <div class="stats-info">
+            <div class="data-label">Deleted Items</div>
+            <div class="data-value">{{ deleted_items_count|default:0 }}</div>
+            <div class="data-sublabel">In trash</div>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-trash"></i>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  {% comment %}
+  <!-- Notifications Section - after the stats cards or other appropriate section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">Recent Notifications</h5>
+          <a
+            href="{% url 'notifications:notification_list' %}"
+            class="btn btn-sm btn-primary"
+          >
+            <i class="fas fa-bell me-1"></i> View All
+          </a>
+        </div>
+        <div class="card-body">
+          {% if recent_notifications %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Title</th>
+                  <th>From</th>
+                  <th>Message</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for notification in recent_notifications %}
+                <tr
+                  {%
+                  if
+                  not
+                  notification.read
+                  %}class="table-info"
+                  {%
+                  endif
+                  %}
+                >
+                  <td>{{ notification.created_at|date:"M d, Y" }}</td>
+                  <td>{{ notification.title }}</td>
+                  <td>
+                    {% if notification.sender %} {{
+                    notification.sender.get_full_name|default:notification.sender.username
+                    }} {% if notification.sender.user_type == 'hospital' %}
+                    <span class="badge bg-info">Hospital</span>
+                    {% endif %} {% else %} System {% endif %}
+                  </td>
+                  <td>{{ notification.message|truncatechars:50 }}</td>
+                  <td>
+                    {% if notification.read %}
+                    <span class="status-badge completed">Read</span>
+                    {% else %}
+                    <span class="status-badge pending">Unread</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a
+                        href="{% url 'notifications:notification_detail' notification.id %}"
+                        class="btn btn-sm btn-info"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      {% if notification.related_link %}
+                      <a
+                        href="{{ notification.related_link }}"
+                        class="btn btn-sm btn-primary"
+                      >
+                        <i class="fas fa-link"></i>
+                      </a>
+                      {% endif %} {% if not notification.read %}
+                      <a
+                        href="{% url 'notifications:mark_as_read' notification.id %}"
+                        class="btn btn-sm btn-success"
+                      >
+                        <i class="fas fa-check"></i>
+                      </a>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-3">
+            <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+            <h5>No Notifications</h5>
+            <p class="text-muted">
+              You don't have any notifications at the moment.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endcomment %}
 
   <!-- Main Dashboard Content -->
   <div class="row">
@@ -223,8 +329,8 @@
               <li class="page-item disabled">
                 <span class="page-link">Previous</span>
               </li>
-              {% endif %} {% for i in hospitals.paginator.page_range %} 
-              {% if hospitals.number == i %}
+              {% endif %} 
+              {% for i in hospitals.paginator.page_range %} {% if hospitals.number == i %}
               <li class="page-item active">
                 <span class="page-link">{{ i }}</span>
               </li>
@@ -333,6 +439,7 @@
     </div>
   </div>
 
+  {% comment %}
   <!-- Second Row - Reports and Trash -->
   <div class="row">
     <!-- Recent Reports -->
@@ -343,10 +450,10 @@
         >
           <h5 class="mb-0">Recent Abandoned Cases</h5>
           <a
-            href="{% url 'reports:report_create' %}"
+            href="{% url 'reports:report_list' %}"
             class="btn btn-sm btn-primary"
           >
-            <i class="fas fa-plus-circle me-1"></i> Report New Case
+            <i class="fas fa-list me-1"></i> View All
           </a>
         </div>
         <div class="card-body">
@@ -409,8 +516,8 @@
             <i class="fas fa-file-medical"></i>
             <h4>No Abandoned Cases</h4>
             <p>There are no recent abandoned case reports.</p>
-            <a href="{% url 'reports:report_create' %}" class="btn btn-primary">
-              <i class="fas fa-plus-circle me-1"></i> Report New Case
+            <a href="{% url 'reports:report_list' %}" class="btn btn-primary">
+              <i class="fas fa-list me-1"></i> View All Reports
             </a>
           </div>
           {% endif %}
@@ -494,6 +601,7 @@
     </div>
   </div>
 </div>
+{% endcomment %}
 
 <!-- Notifications Modal -->
 <div
@@ -542,7 +650,7 @@
         </button>
         {% if unread_notifications %}
         <a
-          href="{% url 'notifications:mark_all_read' %}"
+          href="{% url 'notifications:mark_all_as_read' %}"
           class="btn btn-primary"
           >Mark All as Read</a
         >
