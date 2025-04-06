@@ -1,12 +1,19 @@
 {% extends 'base.html' %} 
-{% load static %} {% load crispy_forms_tags %} {% block title %}Login{% endblock %} {% block extra_css %}
+{% load static %} 
+{% load crispy_forms_tags %} {% block title %}Login{% endblock %} {% block extra_css %}
 <link href="{% static 'css/auth.css' %}" rel="stylesheet" />
 <style>
-  /* Ensure auth container works with fixed navbar */
   .auth-container {
-    padding-top: 1rem;
-    margin-top: 0;
-    min-height: calc(100vh - 71px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 130px); /* Adjust for fixed header and footer */
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 500px;
+    margin: 0;
   }
 </style>
 {% endblock %} {% block content %}

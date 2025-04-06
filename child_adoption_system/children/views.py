@@ -12,6 +12,7 @@ from django.views.generic import UpdateView
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.utils import timezone
+from django.db import connection
 
 from .models import Child, AdoptionApplication
 from .forms import ChildForm, AdoptionApplicationForm, AdoptionApplicationUpdateForm
@@ -104,6 +105,16 @@ def child_list(request):
     elif user.user_type == 'adopter':
         # Adopters can only see available children
         children = Child.objects.filter(status='available')
+        print(f"DEBUG - Available children for adopters: {children.count()}")
+        # Check if any children have status='available'
+        available_count = Child.objects.filter(status='available').count()
+        all_count = Child.objects.all().count()
+        print(f"DEBUG - Total available children in DB: {available_count} out of {all_count}")
+        # Directly check the database
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM children_child WHERE status = 'available'")
+            db_available_count = cursor.fetchone()[0]
+            print(f"DEBUG - Direct SQL count of available children: {db_available_count}")
     elif user.user_type == 'local_leader':
         # Local leaders can see children in their sector/district
         try:

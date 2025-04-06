@@ -1,5 +1,6 @@
-{% extends 'dashboard_base.html' %} {% load static %} {% block title %}Manage
-Local Leaders{% endblock %} {% block page_title %}Manage Local Leaders{% endblock %} {% block breadcrumb %}
+{% extends 'dashboard_base.html' %} 
+{% load static %} 
+{% block title %}Manage Local Leaders{% endblock %} {% block page_title %}Manage Local Leaders{% endblock %} {% block breadcrumb %}
 <li class="breadcrumb-item">
   <a href="{% url 'dashboard:admin_dashboard' %}">Dashboard</a>
 </li>
@@ -24,8 +25,8 @@ Local Leaders{% endblock %} {% block page_title %}Manage Local Leaders{% endbloc
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>create Date</th>
-            <th>Address</th>
+            <th>created Date</th>
+            <th>sector</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -33,9 +34,9 @@ Local Leaders{% endblock %} {% block page_title %}Manage Local Leaders{% endbloc
         <tbody>
           {% for leader in local_leaders %}
           <tr>
-            <td>{{ leader.user}}</td>
+            <td>{{ leader.user }}</td>
             <td>{{ leader.user.email }}</td>
-            <td>{{ leader.created_at }}</td>
+            <td>{{ leader.created_at}}</td>
             <td>{{ leader.sector }}</td>
             <td>
               {% if leader.user.is_active %}

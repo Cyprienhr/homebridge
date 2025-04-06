@@ -111,31 +111,24 @@ class LocalLeaderForm(forms.ModelForm):
 class HospitalForm(forms.ModelForm):
     hospital_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Hospital Name'}))
     contact_info = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Contact Information', 'rows': 3}))
-    local_leader = forms.ModelChoiceField(
-        queryset=LocalLeader.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        required=True,
-        empty_label="Select a Local Leader"
-    )
+    
+    def __init__(self, *args, **kwargs):
+        local_leader_user = kwargs.pop('local_leader_user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Handle the local_leader field
+        if 'local_leader' in self.fields:
+            self.fields['local_leader'].help_text = 'Select the Local Leader who will be responsible for this hospital.'
+            self.fields['local_leader'].widget.attrs.update({'class': 'form-select'})
+            
+            # If form is being used by a local leader, make field hidden and not required
+            if local_leader_user:
+                self.fields['local_leader'].required = False
+                self.fields['local_leader'].widget = forms.HiddenInput()
 
     class Meta:
         model = Hospital
         fields = ('hospital_name', 'contact_info', 'local_leader')
-        
-    def __init__(self, *args, **kwargs):
-        district_admin = kwargs.pop('district_admin', None)
-        local_leader_user = kwargs.pop('local_leader_user', None)
-        super().__init__(*args, **kwargs)
-        
-        if district_admin:
-            # Filter local leaders by district admin
-            self.fields['local_leader'].queryset = LocalLeader.objects.filter(district_admin=district_admin)
-        
-        # If this form is being used by a local leader, hide the local_leader field
-        # as it will be automatically set to the local leader in the view
-        if local_leader_user:
-            self.fields['local_leader'].required = False
-            self.fields['local_leader'].widget = forms.HiddenInput()
 
 class AdopterForm(forms.ModelForm):
     address = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Address', 'rows': 3}))

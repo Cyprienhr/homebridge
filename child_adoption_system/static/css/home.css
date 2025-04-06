@@ -350,23 +350,17 @@
 
 /* Full Screen Hero Styling */
 .full-screen-hero {
-  height: calc(100vh - 71px); /* Adjusted for navbar height */
-  width: 100%;
-  background: linear-gradient(
-      135deg,
-      rgba(0, 194, 203, 0.9),
-      rgba(0, 133, 161, 0.9)
-    ),
-    url("../images/children-bg.jpg");
+  background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.75)),
+    url("../images/hero-bg.jpg");
   background-size: cover;
   background-position: center;
-  color: white;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
   position: relative;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  color: white;
+  padding: 1rem;
 }
 
 /* Animated gradient overlay */

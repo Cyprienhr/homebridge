@@ -41,7 +41,10 @@
             {% endif %}
             <h4>{{ child.name }}</h4>
             <div class="mb-2">
-              <span class="badge {% if child.status == 'available' %}bg-success{% elif child.status == 'pending' %}bg-warning{% else %}bg-primary{% endif %}">{{ child.get_status_display }} </span>
+              <span
+                class="badge {% if child.status == 'available' %}bg-success{% elif child.status == 'pending' %}bg-warning{% else %}bg-primary{% endif %}"
+                >{{ child.get_status_display }}
+              </span>
             </div>
           </div>
 
@@ -53,7 +56,8 @@
               <strong>Date of Birth:</strong> {{ child.date_of_birth|date:"M d, Y" }}
             </div>
             <div class="info-item">
-              <strong>Abandonment Date:</strong> {{ child.abandonment_date|date:"M d, Y" }} </div>
+              <strong>Abandonment Date:</strong> {{ child.abandonment_date|date:"M d, Y" }}
+            </div>
             <div class="info-item">
               <strong>Found At:</strong> {{ child.get_found_location_type_display }}
             </div>
@@ -61,8 +65,7 @@
             <div class="info-item">
               <strong>Location Details:</strong> {{ child.village }}, {{ child.cell }}, {{ child.sector }}, {{ child.district }}
             </div>
-            {% endif %} 
-            {% if child.found_location_type == 'hospital' %}
+            {% endif %} {% if child.found_location_type == 'hospital' %}
             <div class="info-item">
               <strong>Hospital:</strong> {% if child.hospital %}{{ child.hospital.hospital_name }}{% else %}Not specified{% endif %}
             </div>
@@ -87,9 +90,7 @@
       <div class="card shadow">
         <div class="card-header bg-primary text-white">
           <h5 class="mb-0">Review for Adoption</h5>
-          <p class="mb-0 small">
-            
-          </p>
+          <p class="mb-0 small"></p>
         </div>
         <div class="card-body">
           <div class="report-details mb-4">
@@ -153,27 +154,27 @@
                     <h6 class="card-title text-info">
                       Admin Notes (Required for approval)
                     </h6>
-                    <p class="small text-muted mb-2">
+                    {% comment %} <p class="small text-muted mb-2">
                       Please provide detailed notes about why this child should
                       be made available for adoption. These notes will be used
                       for record-keeping purposes.
-                    </p>
+                    </p> {% endcomment %}
                     {{ approval_form.admin_notes|as_crispy_field }}
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-12 mb-3">
+              {% comment %} <div class="col-md-12 mb-3">
                 <h5 class="form-section-title">Report Status Update</h5>
-                {% comment %} <div class="alert alert-warning">
+                <div class="alert alert-warning">
                   <i class="fas fa-exclamation-circle me-2"></i>
                   <strong>Important:</strong> If you select "Make Available for
                   Adoption" above, the report will automatically be marked as
                   "Resolved" and the child will be visible to adopters. This
                   report status selection below is only used when keeping a
                   child as "Pending".
-                </div> {% endcomment %}
-              </div>
+                </div>
+              </div> {% endcomment %}
 
               <div class="col-md-6 mb-3">
                 {{ report_form.status|as_crispy_field }}
@@ -188,7 +189,7 @@
                 {{ report_form.district_admin_notes|as_crispy_field }}
               </div>
 
-              <div class="col-12 mt-4">
+              {% comment %} <div class="col-12 mt-4">
                 <div class="alert alert-info">
                   <i class="fas fa-info-circle me-2"></i>
                   <strong>Note:</strong> Making a child available for adoption
@@ -196,7 +197,7 @@
                   child.
                 </div>
               </div>
-            </div>
+            </div> {% endcomment %}
 
             <div class="d-flex justify-content-between mt-4">
               <a
@@ -246,7 +247,7 @@
 
         // Update the label text and make it very visible
         resolvedLabel.innerHTML =
-          '<i class="fas fa-check-circle me-2"></i><strong>Auto-set to "Resolved"</strong> - When you make a child available for adoption, the report status is automatically set to "Resolved"';
+          '<i class="fas fa-check-circle me-2"></i><strong>Auto-set to "Resolved"</strong> - When you make a child available for adoption, the report status is automatically set to "Resolved">';
 
         // Hide the select field
         const selectField = reportStatusSection.querySelector("select");
@@ -300,21 +301,37 @@
         return false;
       }
 
-      form.classList.add("submitting");
-      submitButton.innerHTML =
-        '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
-      submitButton.disabled = true;
+      // Explicit check and log for child status
+      const selectedStatus = childStatusSelect.value;
+      console.log("Selected child status on form submit:", selectedStatus);
 
       // For available children, ensure we pass a hidden field with resolved status
-      if (childStatusSelect.value === "available") {
+      if (selectedStatus === "available") {
+        console.log("Child status is 'available' - adding force_resolved flag");
         // Create hidden field to ensure report status is set to resolved
         const hiddenField = document.createElement("input");
         hiddenField.type = "hidden";
         hiddenField.name = "force_resolved";
         hiddenField.value = "true";
         form.appendChild(hiddenField);
+
+        // Explicitly set status and force_resolved again for redundancy
+        const statusField = document.createElement("input");
+        statusField.type = "hidden";
+        statusField.name = "explicit_status";
+        statusField.value = "available";
+        form.appendChild(statusField);
+
+        console.log("Added force_resolved and explicit_status fields to form");
       }
 
+      form.classList.add("submitting");
+      submitButton.innerHTML =
+        '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+      submitButton.disabled = true;
+
+      // Log the form data being submitted
+      console.log("Form is being submitted with status:", selectedStatus);
       return true;
     });
   });

@@ -2,16 +2,30 @@
 HomeBridge{% endblock %} {% block extra_css %}
 <link href="{% static 'css/home.css' %}" rel="stylesheet" />
 <style>
-  /* Ensure hero section works with fixed navbar */
   .full-screen-hero {
-    min-height: calc(100vh - 71px);
-    padding-top: 0;
-    margin-top: 0;
+    height: calc(100vh - 130px);
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    margin-top: -20px; /* Adjust for any default margin */
   }
 
-  /* Make sure content doesn't get hidden */
   .hero-content {
-    padding: 2rem 0;
+    padding: 2rem;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.6);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  @media (max-height: 700px) {
+    .full-screen-hero {
+      height: auto;
+      padding: 80px 0;
+    }
   }
 </style>
 {% endblock %} {% block content %}

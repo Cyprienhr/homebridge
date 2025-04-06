@@ -96,11 +96,11 @@
                   <h4 class="text-primary mb-3">
                     <i class="fas fa-child me-2"></i>Adoption Review Required
                   </h4>
-                  <div class="alert alert-info">
+                  {% comment %} <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Admin Action Required:</strong> Review this report
                     and decide if the child should be available for adoption.
-                  </div>
+                  </div> {% endcomment %}
                   <a
                     href="{% url 'reports:review_child_adoption' report.id %}"
                     class="btn btn-primary btn-lg w-100"
@@ -125,14 +125,13 @@
 
                 <div>
                   {% if user.user_type == 'district_admin' and report.status == 'pending' %}
-                  <a
+                  {% comment %} <a
                     href="{% url 'reports:report_update' report.id %}"
                     class="btn btn-warning"
                   >
                     <i class="fas fa-edit me-1"></i> Update Status
-                  </a>
-                  {% endif %} 
-                  {% if user.user_type == 'district_admin' or user.user_type == 'local_leader' or user == report.reported_by %}
+                  </a> {% endcomment %}
+                  {% endif %} {% if user.user_type == 'district_admin' or user.user_type == 'local_leader' or user == report.reported_by %}
                   <a
                     href="{% url 'reports:report_delete' report.id %}"
                     class="btn btn-danger ms-2"

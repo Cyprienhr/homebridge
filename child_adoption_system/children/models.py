@@ -43,6 +43,23 @@ class Child(models.Model):
     def __str__(self):
         return f"{self.name} - {self.status}"
 
+    def make_available(self):
+        """Explicitly make a child available for adoption"""
+        from django.db import connection
+        previous_status = self.status
+        
+        # Use direct SQL for reliability
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE children_child SET status = 'available', updated_at = NOW() WHERE id = %s",
+                [self.id]
+            )
+        
+        # Refresh from database to ensure status is updated
+        self.refresh_from_db()
+        
+        return previous_status
+
 class AdoptionApplication(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending'),

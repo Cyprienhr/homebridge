@@ -372,83 +372,72 @@ def delete_local_leader(request, pk):
 def create_hospital(request):
     # Only district admin or local leader can create hospitals
     if request.user.user_type not in ['district_admin', 'local_leader']:
-        messages.error(request, 'You do not have permission to create hospitals.')
+        messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:dashboard')
     
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         
-        # Initialize hospital form with appropriate parameters based on user type
-        if request.user.user_type == 'district_admin':
-            district_admin = DistrictAdmin.objects.get(user=request.user)
-            hospital_form = HospitalForm(request.POST, district_admin=district_admin)
-        else:  # local_leader
+        # Pass the current user as local_leader_user if they are a local leader
+        if request.user.user_type == 'local_leader':
             hospital_form = HospitalForm(request.POST, local_leader_user=request.user)
+        else:
+            hospital_form = HospitalForm(request.POST)
         
         if user_form.is_valid() and hospital_form.is_valid():
-            try:
-                with transaction.atomic():
-                    user = user_form.save(commit=False)
-                    user.user_type = 'hospital'
-                    user.save()
-                    
-                    hospital = hospital_form.save(commit=False)
-                    hospital.user = user
-                    
-                    if request.user.user_type == 'local_leader':
-                        local_leader = LocalLeader.objects.get(user=request.user)
-                        hospital.local_leader = local_leader
-                    # District admin selects local leader through the form
-                    
-                    hospital.save()
-                    
-                    # Create audit log
-                    AuditLog.objects.create(
-                        user=request.user,
-                        action='create',
-                        model_name='Hospital',
-                        object_id=hospital.id,
-                        object_repr=f'Hospital {user.username}',
-                        reason=f'Created by {request.user.get_user_type_display()} {request.user.username}'
-                    )
-                    
-                    messages.success(request, 'Hospital account created successfully!')
-                    return redirect('accounts:hospital_list')
-            except Exception as e:
-                messages.error(request, f'Error creating hospital: {str(e)}')
+            with transaction.atomic():
+                user = user_form.save(commit=False)
+                user.user_type = 'hospital'
+                user.save()
+                
+                hospital = hospital_form.save(commit=False)
+                hospital.user = user
+                
+                if request.user.user_type == 'local_leader':
+                    local_leader = LocalLeader.objects.get(user=request.user)
+                    hospital.local_leader = local_leader
+                else:  # district_admin
+                    local_leader_id = request.POST.get('local_leader')
+                    local_leader = get_object_or_404(LocalLeader, id=local_leader_id)
+                    hospital.local_leader = local_leader
+                
+                hospital.save()
+                
+                # Create audit log
+                AuditLog.objects.create(
+                    user=request.user,
+                    action='create',
+                    model_name='Hospital',
+                    object_id=hospital.id,
+                    object_repr=f'Hospital {user.username}',
+                    reason=f'Created by {request.user.get_user_type_display()} {request.user.username}'
+                )
+                
+                messages.success(request, 'Hospital account created successfully!')
+                return redirect('accounts:hospital_list')
         else:
+            # Print form errors for debugging
+            print(f"User form errors: {user_form.errors}")
+            print(f"Hospital form errors: {hospital_form.errors}")
             messages.error(request, 'Please correct the errors below.')
     else:
         user_form = UserRegistrationForm()
         
-        # Initialize hospital form with appropriate parameters based on user type
-        if request.user.user_type == 'district_admin':
-            try:
-                district_admin = DistrictAdmin.objects.get(user=request.user)
-                hospital_form = HospitalForm(district_admin=district_admin)
-            except DistrictAdmin.DoesNotExist:
-                messages.error(request, 'District Admin profile not found.')
-                hospital_form = HospitalForm()
-        else:  # local_leader
+        # Pass the current user as local_leader_user if they are a local leader
+        if request.user.user_type == 'local_leader':
             hospital_form = HospitalForm(local_leader_user=request.user)
+        else:
+            hospital_form = HospitalForm()
     
     context = {
         'user_form': user_form,
         'hospital_form': hospital_form
     }
     
-    # If district admin, check if local leaders exist
+    # If district admin, add local leaders to select from
     if request.user.user_type == 'district_admin':
-        try:
-            district_admin = DistrictAdmin.objects.get(user=request.user)
-            local_leaders = LocalLeader.objects.filter(district_admin=district_admin)
-            
-            # Add debug info about local leaders
-            if not local_leaders.exists():
-                messages.warning(request, 'You do not have any Local Leaders in your district. Please create at least one Local Leader first.')
-                return redirect('accounts:local_leader_list')
-        except DistrictAdmin.DoesNotExist:
-            messages.error(request, 'District Admin profile not found.')
+        district_admin = DistrictAdmin.objects.get(user=request.user)
+        context['local_leaders'] = LocalLeader.objects.filter(district_admin=district_admin)
     
     return render(request, 'accounts/create_hospital.html', context)
 
@@ -459,22 +448,15 @@ def hospital_list(request):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:dashboard')
     
-    context = {}
-    
     if request.user.user_type == 'district_admin':
         district_admin = DistrictAdmin.objects.get(user=request.user)
         local_leaders = LocalLeader.objects.filter(district_admin=district_admin)
         hospitals = Hospital.objects.filter(local_leader__in=local_leaders)
-        
-        # Check if local leaders exist
-        context['local_leaders_exist'] = local_leaders.exists()
     else:  # local_leader
         local_leader = LocalLeader.objects.get(user=request.user)
         hospitals = Hospital.objects.filter(local_leader=local_leader)
-        context['local_leaders_exist'] = True  # Local leaders don't need this check
     
-    context['hospitals'] = hospitals
-    return render(request, 'accounts/hospital_list.html', context)
+    return render(request, 'accounts/hospital_list.html', {'hospitals': hospitals})
 
 @login_required
 def delete_hospital(request, pk):
@@ -688,46 +670,43 @@ def edit_local_leader(request, pk):
 def edit_hospital(request, pk):
     # Only district admin or local leader can edit hospitals
     if request.user.user_type not in ['district_admin', 'local_leader']:
-        messages.error(request, 'You do not have permission to edit hospitals.')
+        messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:dashboard')
     
-    try:
-        # Determine if the user has permission to edit this hospital
-        if request.user.user_type == 'local_leader':
-            local_leader = LocalLeader.objects.get(user=request.user)
-            hospital = get_object_or_404(Hospital, id=pk, local_leader=local_leader)
-        else:  # district_admin
-            district_admin = DistrictAdmin.objects.get(user=request.user)
-            hospital = get_object_or_404(Hospital, id=pk, local_leader__district_admin=district_admin)
-    except (LocalLeader.DoesNotExist, DistrictAdmin.DoesNotExist):
-        messages.error(request, 'Your profile is not properly set up.')
-        return redirect('dashboard:dashboard')
-    except Hospital.DoesNotExist:
-        messages.error(request, 'Hospital not found or you do not have permission to edit it.')
-        return redirect('accounts:hospital_list')
+    hospital = get_object_or_404(Hospital, pk=pk)
+    
+    # Ensure the hospital belongs to this local leader or district
+    if request.user.user_type == 'local_leader':
+        local_leader = LocalLeader.objects.get(user=request.user)
+        if hospital.local_leader != local_leader:
+            messages.error(request, 'You do not have permission to edit this hospital.')
+            return redirect('accounts:hospital_list')
+    else:  # district_admin
+        district_admin = DistrictAdmin.objects.get(user=request.user)
+        if hospital.local_leader.district_admin != district_admin:
+            messages.error(request, 'You do not have permission to edit this hospital.')
+            return redirect('accounts:hospital_list')
     
     if request.method == 'POST':
         user_form = UserProfileForm(request.POST, instance=hospital.user)
         
-        # Initialize hospital form with appropriate parameters
-        if request.user.user_type == 'district_admin':
-            district_admin = DistrictAdmin.objects.get(user=request.user)
-            hospital_form = HospitalForm(request.POST, instance=hospital, district_admin=district_admin)
-        else:  # local_leader
+        # Pass local_leader_user for local leader users
+        if request.user.user_type == 'local_leader':
             hospital_form = HospitalForm(request.POST, instance=hospital, local_leader_user=request.user)
+        else:
+            hospital_form = HospitalForm(request.POST, instance=hospital)
         
         if user_form.is_valid() and hospital_form.is_valid():
             with transaction.atomic():
                 user = user_form.save()
+                hospital = hospital_form.save(commit=False)
                 
-                # If local leader is editing, ensure we don't change the local_leader field
+                # Ensure local_leader field isn't changed if a local_leader is editing
                 if request.user.user_type == 'local_leader':
-                    hospital = hospital_form.save(commit=False)
                     local_leader = LocalLeader.objects.get(user=request.user)
                     hospital.local_leader = local_leader
-                    hospital.save()
-                else:
-                    hospital = hospital_form.save()
+                
+                hospital.save()
                 
                 # Create audit log
                 AuditLog.objects.create(
@@ -742,21 +721,28 @@ def edit_hospital(request, pk):
                 messages.success(request, 'Hospital account updated successfully!')
                 return redirect('accounts:hospital_list')
         else:
+            # Print form errors for debugging
+            print(f"User form errors: {user_form.errors}")
+            print(f"Hospital form errors: {hospital_form.errors}")
             messages.error(request, 'Please correct the errors below.')
     else:
         user_form = UserProfileForm(instance=hospital.user)
         
-        # Initialize hospital form with appropriate parameters
-        if request.user.user_type == 'district_admin':
-            district_admin = DistrictAdmin.objects.get(user=request.user)
-            hospital_form = HospitalForm(instance=hospital, district_admin=district_admin)
-        else:  # local_leader
+        # Pass local_leader_user for local leader users
+        if request.user.user_type == 'local_leader':
             hospital_form = HospitalForm(instance=hospital, local_leader_user=request.user)
+        else:
+            hospital_form = HospitalForm(instance=hospital)
     
     context = {
         'user_form': user_form,
         'hospital_form': hospital_form,
         'hospital': hospital
     }
+    
+    # If district admin, add local leaders to select from
+    if request.user.user_type == 'district_admin':
+        district_admin = DistrictAdmin.objects.get(user=request.user)
+        context['local_leaders'] = LocalLeader.objects.filter(district_admin=district_admin)
     
     return render(request, 'accounts/edit_hospital.html', context)

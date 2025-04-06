@@ -1,12 +1,13 @@
-{% extends 'dashboard_base.html' %} {% load static %} {% block title %}Edit
-Hospital{% endblock %} {% block page_title %}Edit Hospital{% endblock %} {% block breadcrumb %}
+{% extends 'dashboard_base.html' %} 
+{% load static %} 
+{% block title %}Edit Hospital{% endblock %} {% block page_title %}Edit Hospital{% endblock %} {% block breadcrumb %}
 <li class="breadcrumb-item">
   <a href="{% url 'dashboard:admin_dashboard' %}">Dashboard</a>
 </li>
 <li class="breadcrumb-item">
   <a href="{% url 'accounts:hospital_list' %}">Hospitals</a>
 </li>
-<li class="breadcrumb-item active">Edit Hospital</li>
+<li class="breadcrumb-item active">Edit</li>
 {% endblock %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/hospital_dashboard.css' %}" />
 <style>
@@ -36,7 +37,7 @@ Hospital{% endblock %} {% block page_title %}Edit Hospital{% endblock %} {% bloc
 {% endblock %} {% block content %}
 <div class="card shadow-sm">
   <div class="card-header">
-    <h5 class="mb-0">Edit Hospital Details</h5>
+    <h5 class="mb-0">Edit Hospital Account</h5>
   </div>
   <div class="card-body">
     <form method="post">
@@ -77,16 +78,49 @@ Hospital{% endblock %} {% block page_title %}Edit Hospital{% endblock %} {% bloc
               <div class="col-md-6">
                 <div class="mb-3">
                   <label
+                    for="{{ user_form.first_name.id_for_label }}"
+                    class="form-label"
+                    >First Name</label
+                  >
+                  {{ user_form.first_name }} 
+                  {% if user_form.first_name.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.first_name.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="mb-3">
+                  <label
+                    for="{{ user_form.last_name.id_for_label }}"
+                    class="form-label"
+                    >Last Name</label
+                  >
+                  {{ user_form.last_name }} {% if user_form.last_name.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.last_name.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label
                     for="{{ user_form.phone_number.id_for_label }}"
                     class="form-label"
                     >Phone Number</label
                   >
-                  {{ user_form.phone_number }} {% if user_form.phone_number.errors %}
+                  {{ user_form.phone_number }} 
+                  {% if user_form.phone_number.errors %}
                   <div class="invalid-feedback d-block">
                     {{ user_form.phone_number.errors }}
                   </div>
                   {% endif %}
                 </div>
+              </div>
+              <div class="col-md-6">
                 <div class="mb-3">
                   <label
                     for="{{ user_form.address.id_for_label }}"
@@ -114,7 +148,8 @@ Hospital{% endblock %} {% block page_title %}Edit Hospital{% endblock %} {% bloc
                 class="form-label"
                 >Hospital Name</label
               >
-              {{ hospital_form.hospital_name }} {% if hospital_form.hospital_name.errors %}
+              {{ hospital_form.hospital_name }} 
+              {% if hospital_form.hospital_name.errors %}
               <div class="invalid-feedback d-block">
                 {{ hospital_form.hospital_name.errors }}
               </div>
@@ -127,7 +162,8 @@ Hospital{% endblock %} {% block page_title %}Edit Hospital{% endblock %} {% bloc
                 class="form-label"
                 >Contact Information</label
               >
-              {{ hospital_form.contact_info }} {% if hospital_form.contact_info.errors %}
+              {{ hospital_form.contact_info }} 
+              {% if hospital_form.contact_info.errors %}
               <div class="invalid-feedback d-block">
                 {{ hospital_form.contact_info.errors }}
               </div>
@@ -139,17 +175,19 @@ Hospital{% endblock %} {% block page_title %}Edit Hospital{% endblock %} {% bloc
               <label
                 for="{{ hospital_form.local_leader.id_for_label }}"
                 class="form-label"
-                >Local Leader</label
+                >Assign to Local Leader</label
               >
-              {{ hospital_form.local_leader }} {% if hospital_form.local_leader.errors %}
+              {{ hospital_form.local_leader }} 
+              {% if hospital_form.local_leader.errors %}
               <div class="invalid-feedback d-block">
                 {{ hospital_form.local_leader.errors }}
               </div>
-              {% endif %}
-              <div class="form-text">
-                Select the Local Leader who will be responsible for this
-                hospital.
+              {% endif %} {% if hospital_form.local_leader.help_text %}
+              <div class="form-text small mt-1 text-info">
+                <i class="fas fa-info-circle me-1"></i> 
+                {{ hospital_form.local_leader.help_text }}
               </div>
+              {% endif %}
             </div>
             {% endif %}
           </div>

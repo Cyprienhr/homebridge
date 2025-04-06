@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db import transaction
+from django.db import connection
 
 from .models import Report
 from .forms import ReportForm, ReportUpdateForm, AbandonedChildReportForm, ChildAdoptionApprovalForm
@@ -267,7 +268,11 @@ def report_update(request, pk):
         form = ReportUpdateForm(request.POST, instance=report)
         if form.is_valid():
             old_status = report.status
-            updated_report = form.save()
+            
+            # Manually update the report object since ReportUpdateForm doesn't have save()
+            report.status = form.cleaned_data['status']
+            report.district_admin_notes = form.cleaned_data['district_admin_notes']
+            report.save()
             
             # Create audit log
             AuditLog.objects.create(
@@ -364,9 +369,18 @@ def review_child_adoption(request, report_id):
         child_status = request.POST.get('status')
         admin_notes = request.POST.get('admin_notes', '')
         district_admin_notes = request.POST.get('district_admin_notes', '')
+        force_resolved = request.POST.get('force_resolved') == 'true'
+        
+        # Check if we have an explicit status override from JavaScript
+        explicit_status = request.POST.get('explicit_status')
+        if explicit_status == 'available':
+            child_status = 'available'
+            force_resolved = True
+            print(f"DEBUG - Using explicit_status override: {explicit_status}")
         
         print(f"POST data received: {request.POST}")
         print(f"Child status: {child_status}")
+        print(f"Force resolved: {force_resolved}")
         
         # Basic validation
         if not child_status:
@@ -378,34 +392,54 @@ def review_child_adoption(request, report_id):
             return redirect('reports:review_child_adoption', report_id=report_id)
         
         try:
-            # SIMPLIFIED APPROACH: Directly update the models
+            # Use transaction to ensure both updates happen or neither happens
+            with transaction.atomic():
+                # Store previous status for logging
+                previous_status = child.status
+                
+                # Direct SQL update for child status to ensure it's correctly saved
+                if child_status == 'available':
+                    with connection.cursor() as cursor:
+                        # Update using raw SQL for direct database access
+                        cursor.execute(
+                            "UPDATE children_child SET status = %s, admin_notes = %s, updated_at = NOW() WHERE id = %s",
+                            [child_status, admin_notes, child.id]
+                        )
+                        print(f"DEBUG - Direct SQL update executed for child {child.id} to status: {child_status}")
+                else:
+                    # Use normal ORM for non-available status
+                    child.status = child_status
+                    child.admin_notes = admin_notes
+                    child.save()
+                
+                # Reload the child from database to verify changes
+                child.refresh_from_db()
+                print(f"DEBUG - After refresh: Child status is now {child.status}")
+                
+                # Step 2: Update the report
+                report.district_admin_notes = district_admin_notes
+                
+                # Step 3: Set report status based on child status
+                if child.status == 'available' or force_resolved:
+                    # Child is available, always set report to resolved
+                    report.status = 'resolved'
+                    success_message = f"Success! {child.name} is now available for adoption and will be visible to potential adopters."
+                    print(f"DEBUG - Setting report status to RESOLVED")
+                else:
+                    # For pending child status, set report to reviewed
+                    report.status = 'reviewed'
+                    success_message = f"{child.name} remains in pending status and is not visible to adopters yet."
+                    print(f"DEBUG - Setting report status to REVIEWED")
+                
+                report.save()
+                print(f"DEBUG - Report {report.id} status updated to {report.status}")
             
-            # Step 1: Update the child first
-            previous_status = child.status
-            child.status = child_status
-            child.admin_notes = admin_notes
-            child.save()
-            
-            # Step 2: Update the report and handle forced resolution
-            report.district_admin_notes = district_admin_notes
-            force_resolved = request.POST.get('force_resolved') == 'true'
-            
-            # Step 3: Check actual saved child status and set appropriate report status
-            print(f"DEBUG - Child status after save: {child.status}")
-            
-            # Always respect when child is available or force_resolved is set
-            if child.status == 'available' or force_resolved:
-                # Child is available, always set report to resolved
-                report.status = 'resolved'
-                success_message = f"Success! {child.name} is now available for adoption and will be visible to potential adopters."
-                print(f"DEBUG - Setting child as AVAILABLE with message: {success_message}")
-            else:
-                # For pending child status, set report to reviewed
-                report.status = 'reviewed'
-                success_message = f"{child.name} remains in pending status and is not visible to adopters yet."
-                print(f"DEBUG - Keeping child as PENDING with message: {success_message}")
-            
-            report.save()
+            # Direct verification that child is available now
+            from django.db import connections
+            with connections['default'].cursor() as cursor:
+                cursor.execute("SELECT status FROM children_child WHERE id = %s", [child.id])
+                db_status = cursor.fetchone()[0]
+                print(f"VERIFICATION - Direct DB check shows child {child.id} status is: {db_status}")
             
             # Step 4: Create audit log
             AuditLog.objects.create(
@@ -436,7 +470,7 @@ def review_child_adoption(request, report_id):
             return redirect('reports:report_detail', pk=report.id)
         
         except Exception as e:
-            print(f"Error: {str(e)}")
+            print(f"ERROR: {str(e)}")
             messages.error(request, f"An error occurred: {str(e)}")
             return redirect('reports:review_child_adoption', report_id=report_id)
     
