@@ -30,6 +30,7 @@
     var(--primary-dark) 100%
   );
   z-index: 1;
+  margin-top: 0; /* No need for extra margin since body has padding-top */
 }
 
 .auth-container::before {

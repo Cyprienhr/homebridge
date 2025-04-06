@@ -155,17 +155,28 @@ img {
   cursor: pointer !important;
   z-index: 9999 !important;
   position: relative !important;
-  display: block !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   font-size: 1.5rem !important;
   color: #333 !important;
-  padding: 0.5rem !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
   margin-right: 0.75rem !important;
   background: transparent !important;
   border: none !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.sidebar-toggler:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
 .sidebar-toggler i {
   display: inline-block !important;
+  line-height: 1 !important;
 }
 
 .logo {
@@ -650,19 +661,20 @@ body.sidebar-collapsed .sidebar .submenu a {
   }
 
   .sidebar {
-    top: var(--topbar-height) !important;
     transform: translateX(-100%) !important;
     transition: transform 0.3s ease !important;
     position: fixed !important;
-    left: 0 !important;
+    top: 70px !important;
+    bottom: 0 !important;
     width: 280px !important;
     z-index: 1040 !important;
+    overflow-y: auto !important;
+    box-shadow: none !important;
   }
 
   body.sidebar-mobile-visible .sidebar {
     transform: translateX(0) !important;
-    left: 0 !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
   }
 
   .content,
@@ -673,26 +685,30 @@ body.sidebar-collapsed .sidebar .submenu a {
   }
 
   body.sidebar-mobile-visible::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1010;
+    content: "" !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1030 !important;
   }
 
   .sidebar-toggler {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    position: relative;
-    z-index: 1080;
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    margin-right: 0.5rem;
-    color: var(--primary-color);
+    margin-right: 12px !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+    border-radius: 4px !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body.sidebar-mobile-visible .sidebar-toggler {
+    background-color: var(--primary-light) !important;
+    color: white !important;
   }
 
   .topbar {
@@ -1153,11 +1169,11 @@ textarea.form-control {
   }
 
   .topbar-nav .nav-link {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem;
   }
 
   .topbar-nav .dropdown-menu {
-    min-width: 240px;
+    width: 280px;
     right: -10px;
   }
 
@@ -1166,12 +1182,12 @@ textarea.form-control {
   }
 
   .breadcrumb {
-    font-size: 0.8rem;
-    margin-bottom: 0.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
   .footer {
-    padding: 0.75rem 0;
+    flex-direction: column;
     text-align: center;
   }
 
@@ -1181,26 +1197,23 @@ textarea.form-control {
   }
 
   .footer p {
-    margin-bottom: 0;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .card-body {
     padding: 1rem;
   }
 
-  /* Improve mobile dashboard layout */
   .dashboard-stats .stat-card {
     margin-bottom: 1rem;
   }
 
   .stat-details h3 {
-    font-size: 1.75rem !important;
+    font-size: 1.25rem;
   }
 
-  /* Responsive tables */
   .table-responsive {
-    border: 0;
+    border: none;
   }
 
   .table td,
@@ -1208,35 +1221,35 @@ textarea.form-control {
     padding: 0.5rem;
   }
 
-  /* Make adoption process responsive */
   .adoption-process-horizontal {
     overflow-x: auto;
-    padding-bottom: 1rem;
   }
 
-  /* Ensure the sidebar toggle is visible */
   .sidebar-toggler {
-    position: relative;
-    z-index: 1050;
-    margin-right: 0.5rem;
-    padding: 0.5rem;
+    width: 40px !important;
+    height: 40px !important;
+    margin-right: 10px !important;
+    background-color: rgba(63, 81, 181, 0.1) !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: var(--primary-color) !important;
+    font-size: 1.25rem !important;
   }
 
-  /* Fix icon alignment in toggler */
   .sidebar-toggler i {
-    font-size: 1.25rem;
+    font-size: 1.25rem !important;
   }
 
-  /* Make sure topbar elements are sized correctly */
   .topbar {
-    height: var(--topbar-height);
-    padding: 0 0.5rem;
+    padding: 0 1rem;
+    height: 60px;
   }
 
-  /* Ensure sidebar is positioned correctly */
   .sidebar {
-    top: var(--topbar-height);
-    height: calc(100vh - var(--topbar-height));
+    width: 260px !important;
+    top: 60px !important;
   }
 }
 

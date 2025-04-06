@@ -1,0 +1,88 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Update Application Status{% endblock %}
+
+{% block page_title %}Update Application Status{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dashboard:admin_dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'children:application_list' %}">Applications</a></li>
+<li class="breadcrumb-item active">Update Status</li>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/district_admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-edit me-2"></i> Update Application Status
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6 class="mb-3">Application Details</h6>
+                <p><strong>Child:</strong> {{ application.child.name }}</p>
+                <p><strong>Applicant:</strong> {{ application.adopter.full_name }}</p>
+                <p><strong>Date Applied:</strong> {{ application.application_date|date:"F d, Y" }}</p>
+                <p><strong>Current Status:</strong> 
+                    <span class="badge bg-{% if application.application_status == 'pending' %}warning{% elif application.application_status == 'approved' %}success{% else %}danger{% endif %}">
+                        {{ application.get_application_status_display }}
+                    </span>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="mb-3">Child Information</h6>
+                <p><strong>Name:</strong> {{ application.child.name }}</p>
+                <p><strong>Age:</strong> {{ application.child.age }}</p>
+                <p><strong>Gender:</strong> {{ application.child.get_gender_display }}</p>
+                <p><strong>Status:</strong> {{ application.child.get_status_display }}</p>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="status" class="form-label">Update Application Status</label>
+                <select name="status" id="status" class="form-select" required>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if application.application_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="notes" class="form-label">Admin Notes</label>
+                <textarea name="notes" id="notes" class="form-control" rows="5" placeholder="Add notes explaining your decision...">{{ application.admin_notes }}</textarea>
+                <div class="form-text">These notes will be visible to the applicant.</div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Important:</strong> 
+                {% if application.application_status == 'pending' %}
+                <ul class="mb-0 mt-2">
+                    <li>If you <strong>approve</strong> this application, the child will be marked as adopted and all other pending applications for this child will be automatically rejected.</li>
+                    <li>If you <strong>reject</strong> this application, the applicant will be notified and the child will remain available for other adopters.</li>
+                </ul>
+                {% else %}
+                <p class="mb-0">This application is already {{ application.get_application_status_display|lower }}. Changing the status may affect the child's availability status.</p>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'children:application_detail' application.id %}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-arrow-left me-1"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Update Status
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

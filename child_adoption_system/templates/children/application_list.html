@@ -114,7 +114,7 @@
                                                     <a href="{% url 'children:application_detail' application.id %}" class="btn btn-outline-primary">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    {% if request.user.user_type == 'district_admin' and application.application_status == 'pending' %}
+                                                    {% if request.user.user_type == 'district_admin' %}
                                                         <a href="{% url 'children:update_application_status' application.id %}" class="btn btn-outline-success">
                                                             <i class="fas fa-edit"></i>
                                                         </a>

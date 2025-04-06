@@ -41,11 +41,7 @@
             {% endif %}
             <h4>{{ child.name }}</h4>
             <div class="mb-2">
-              <span
-                class="badge {% if child.status == 'available' %}bg-success{% elif child.status == 'pending' %}bg-warning{% else %}bg-primary{% endif %}"
-              >
-                {{ child.get_status_display }}
-              </span>
+              <span class="badge {% if child.status == 'available' %}bg-success{% elif child.status == 'pending' %}bg-warning{% else %}bg-primary{% endif %}">{{ child.get_status_display }} </span>
             </div>
           </div>
 
@@ -54,36 +50,28 @@
               <strong>Gender:</strong> {{ child.get_gender_display }}
             </div>
             <div class="info-item">
-              <strong>Date of Birth:</strong> {{ child.date_of_birth|date:"M d,
-              Y" }}
+              <strong>Date of Birth:</strong> {{ child.date_of_birth|date:"M d, Y" }}
             </div>
             <div class="info-item">
-              <strong>Abandonment Date:</strong> {{
-              child.abandonment_date|date:"M d, Y" }}
-            </div>
+              <strong>Abandonment Date:</strong> {{ child.abandonment_date|date:"M d, Y" }} </div>
             <div class="info-item">
-              <strong>Found At:</strong> {{
-              child.get_found_location_type_display }}
+              <strong>Found At:</strong> {{ child.get_found_location_type_display }}
             </div>
             {% if child.found_location_type == 'street' %}
             <div class="info-item">
-              <strong>Location Details:</strong> {{ child.village }}, {{
-              child.cell }}, {{ child.sector }}, {{ child.district }}
+              <strong>Location Details:</strong> {{ child.village }}, {{ child.cell }}, {{ child.sector }}, {{ child.district }}
             </div>
-            {% endif %} {% if child.found_location_type == 'hospital' %}
+            {% endif %} 
+            {% if child.found_location_type == 'hospital' %}
             <div class="info-item">
-              <strong>Hospital:</strong> {% if child.hospital %}{{
-              child.hospital.hospital_name }}{% else %}Not specified{% endif %}
+              <strong>Hospital:</strong> {% if child.hospital %}{{ child.hospital.hospital_name }}{% else %}Not specified{% endif %}
             </div>
             {% endif %}
             <div class="info-item">
-              <strong>Reported By:</strong> {{
-              report.reported_by.get_full_name|default:report.reported_by.username
-              }} ({{ report.reported_by.get_user_type_display }})
+              <strong>Reported By:</strong> {{ report.reported_by.get_full_name|default:report.reported_by.username }} ({{ report.reported_by.get_user_type_display }})
             </div>
             <div class="info-item">
-              <strong>Report Date:</strong> {{ report.report_date|date:"M d, Y"
-              }}
+              <strong>Report Date:</strong> {{ report.report_date|date:"M d, Y"}}
             </div>
             <div class="info-item">
               <strong>Description:</strong>
@@ -100,7 +88,7 @@
         <div class="card-header bg-primary text-white">
           <h5 class="mb-0">Review for Adoption</h5>
           <p class="mb-0 small">
-            Approve or keep this child pending for adoption
+            
           </p>
         </div>
         <div class="card-body">
@@ -134,12 +122,12 @@
             <div class="row">
               <div class="col-md-12 mb-3">
                 <h5 class="form-section-title">Adoption Status Decision</h5>
-                <div class="alert alert-warning">
+                {% comment %} <div class="alert alert-warning">
                   <i class="fas fa-exclamation-triangle me-2"></i>
                   <strong>Important:</strong> As a District Administrator, your
                   decision will determine if this child becomes visible to
                   potential adopters.
-                </div>
+                </div> {% endcomment %}
               </div>
 
               {% if approval_form.non_field_errors %}
@@ -177,14 +165,14 @@
 
               <div class="col-md-12 mb-3">
                 <h5 class="form-section-title">Report Status Update</h5>
-                <div class="alert alert-warning">
+                {% comment %} <div class="alert alert-warning">
                   <i class="fas fa-exclamation-circle me-2"></i>
                   <strong>Important:</strong> If you select "Make Available for
                   Adoption" above, the report will automatically be marked as
                   "Resolved" and the child will be visible to adopters. This
                   report status selection below is only used when keeping a
                   child as "Pending".
-                </div>
+                </div> {% endcomment %}
               </div>
 
               <div class="col-md-6 mb-3">

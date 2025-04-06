@@ -317,15 +317,15 @@
     <div class="topbar">
       <div class="topbar-left">
         <button
-          class="sidebar-toggler"
           id="sidebarToggler"
+          class="sidebar-toggler"
           type="button"
-          aria-label="Toggle Sidebar"
+          aria-label="Toggle navigation"
         >
           <i class="fas fa-bars"></i>
         </button>
         <a href="{% url 'dashboard:dashboard' %}" class="logo">
-          <img src="{% static 'images/logo.png' %}" alt="Logo" />
+          <img src="{% static 'images/logo.png' %}" alt="HomeBridge Logo" />
           <span>HomeBridge</span>
         </a>
       </div>
@@ -571,7 +571,8 @@
             </a>
           </li>
 
-          {% comment %} <li class="nav-header">Reports</li>
+          {% comment %}
+          <li class="nav-header">Reports</li>
           <li class="nav-item">
             <a href="{% url 'reports:report_list' %}" class="nav-link">
               <i class="fas fa-flag"></i>
@@ -595,7 +596,8 @@
               <i class="fas fa-check"></i>
               <span>Resolved Reports</span>
             </a>
-          </li> {% endcomment %}
+          </li>
+          {% endcomment %}
 
           <li class="nav-header">System</li>
           <li class="nav-item">
@@ -740,7 +742,7 @@
               <span>Report Abandoned Child</span>
             </a>
           </li>
-          <li class="nav-item">
+          {% comment %} <li class="nav-item">
             <a href="{% url 'reports:report_list' %}" class="nav-link">
               <i class="fas fa-list"></i>
               <span>View Reports</span>
@@ -769,7 +771,7 @@
               <i class="fas fa-check-circle"></i>
               <span>Resolved Reports</span>
             </a>
-          </li>
+          </li> {% endcomment %}
 
           <li class="nav-header">System</li>
           <li class="nav-item">
@@ -850,7 +852,7 @@
           </li>
           {% endcomment %}
 
-          <li class="nav-header">Reports</li>
+          <li class="nav-header">Reports & Cases</li>
           <li class="nav-item">
             <a
               href="{% url 'reports:report_abandoned_child' %}"
@@ -860,12 +862,12 @@
               <span>Report Abandoned Child</span>
             </a>
           </li>
-          <li class="nav-item">
+          {% comment %} <li class="nav-item">
             <a href="{% url 'reports:report_list' %}" class="nav-link">
               <i class="fas fa-list"></i>
               <span>View Reports</span>
             </a>
-          </li>
+          </li> {% endcomment %}
 
           <li class="nav-header">System</li>
           <li class="nav-item">
@@ -963,37 +965,34 @@
     </a>
 
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/dashboard.js' %}"></script>
     {% block extra_js %}{% endblock %}
 
     <!-- CRITICAL DIRECT FIX FOR SIDEBAR TOGGLE -->
     <script>
-      // Execute immediately without waiting for DOM to fully load
+      // Sidebar toggle functionality
       (function () {
-        // Make sure this runs on page load
-        console.log("DIRECT FIX: Initializing sidebar toggle");
+        console.log("DIRECT FIX: Setting up sidebar toggler");
 
-        // Set up toggle button click handler
-        var setupToggler = function () {
-          var sidebarToggler = document.getElementById("sidebarToggler");
+        const setupToggler = function () {
+          const sidebarToggler = document.getElementById("sidebarToggler");
+          const body = document.body;
+
           if (sidebarToggler) {
-            console.log("DIRECT FIX: Found sidebar toggler");
+            console.log(
+              "DIRECT FIX: Sidebar toggler found, setting up click handler"
+            );
 
-            // Remove any existing event listeners
-            var newToggler = sidebarToggler.cloneNode(true);
+            // Clear any existing event listeners
+            const newToggler = sidebarToggler.cloneNode(true);
             sidebarToggler.parentNode.replaceChild(newToggler, sidebarToggler);
 
-            // Add new click handler
             newToggler.addEventListener("click", function (e) {
               e.preventDefault();
               e.stopPropagation();
-              console.log("DIRECT FIX: Sidebar toggle clicked");
 
-              var body = document.body;
-              var isMobile = window.innerWidth < 992;
-
-              if (isMobile) {
+              if (window.innerWidth < 992) {
                 body.classList.toggle("sidebar-mobile-visible");
                 console.log(
                   "DIRECT FIX: Mobile sidebar toggled",
@@ -1016,7 +1015,9 @@
         };
 
         // Try to initialize immediately
-        setupToggler();
+        document.addEventListener("DOMContentLoaded", function () {
+          setupToggler();
+        });
 
         // Also handle outside clicks to close sidebar on mobile
         document.addEventListener("click", function (e) {

@@ -40,6 +40,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-top: 71px; /* Adjust this value to match your navbar height */
 }
 
 a {
@@ -66,6 +67,12 @@ main {
   padding: 0.75rem 0;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.98);
 }
 
 .navbar.navbar-scrolled {
@@ -519,4 +526,9 @@ footer {
 .feature-card p {
   color: var(--text-muted);
   line-height: 1.7;
+}
+
+/* Add scroll margin for anchor links */
+[id] {
+  scroll-margin-top: 80px; /* Slightly larger than navbar height to provide some space */
 }

@@ -401,9 +401,7 @@ block breadcrumb %}
 <div class="row">
   <div class="col-12">
     <div class="card">
-      <div
-        class="card-header d-flex justify-content-between align-items-center"
-      >
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="m-0">Upcoming Appointments</h6>
         <a
           href="{% url 'appointments:appointment_list' %}"
@@ -432,9 +430,7 @@ block breadcrumb %}
                 <td>{{ appointment.child.name }}</td>
                 <td>{{ appointment.adopter.full_name }}</td>
                 <td>
-                  <span
-                    class="status-badge {% if appointment.status == 'pending' %}pending{% elif appointment.status == 'approved' %}approved{% elif appointment.status == 'cancelled' %}rejected{% else %}waiting{% endif %}"
-                  >
+                  <span class="status-badge {% if appointment.status == 'pending' %}pending{% elif appointment.status == 'approved' %}approved{% elif appointment.status == 'cancelled' %}rejected{% else %}waiting{% endif %}">
                     {{ appointment.get_status_display }}
                   </span>
                 </td>
@@ -452,7 +448,7 @@ block breadcrumb %}
               {% empty %}
               <tr>
                 <td colspan="5" class="text-center">
-                  No upcoming appointments found
+                  Click on view all upcoming appointments to see all appointments
                 </td>
               </tr>
               {% endfor %}

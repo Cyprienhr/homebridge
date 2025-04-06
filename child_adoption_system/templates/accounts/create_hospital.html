@@ -1,51 +1,205 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load crispy_forms_tags %}
+{% extends 'dashboard_base.html' %} {% load static %} {% block title %}Create
+Hospital{% endblock %} {% block page_title %}Create Hospital{% endblock %} {% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboard:admin_dashboard' %}">Dashboard</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'accounts:hospital_list' %}">Hospitals</a>
+</li>
+<li class="breadcrumb-item active">Create</li>
+{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/hospital_dashboard.css' %}" />
+<style>
+  .card-title-divider {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
 
-{% block title %}Create Hospital{% endblock %}
+  .form-section {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    height: 100%;
+  }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">Create Hospital Account</h4>
+  .form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control,
+  .form-select {
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="card shadow-sm">
+  <div class="card-header">
+    <h5 class="mb-0">Create Hospital Account</h5>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mb-4 mb-md-0">
+          <div class="form-section">
+            <h6 class="card-title-divider">User Account Information</h6>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label
+                    for="{{ user_form.username.id_for_label }}"
+                    class="form-label"
+                    >Username</label
+                  >
+                  {{ user_form.username }} {% if user_form.username.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.username.errors }}
+                  </div>
+                  {% endif %}
                 </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <h5 class="mb-3">User Account Information</h5>
-                        {{ user_form|crispy }}
-                        
-                        <h5 class="mb-3 mt-4">Hospital Information</h5>
-                        {{ hospital_form|crispy }}
-                        
-                        {% comment %} {% if request.user.user_type == 'district_admin' %}
-                            <div class="mb-3">
-                                <label for="local_leader" class="form-label">Assign to Local Leader</label>
-                                <select name="local_leader" id="local_leader" class="form-select" required>
-                                    <option value="">Select a Local Leader</option>
-                                    {% for leader in local_leaders %}
-                                        <option value="{{ leader.id }}">{{ leader.user.get_full_name|default:leader.user.username }} - {{ leader.sector }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        {% endif %}
-                         {% endcomment %}
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'accounts:hospital_list' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to List
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Create Hospital
-                            </button>
-                        </div>
-                    </form>
+                <div class="mb-3">
+                  <label
+                    for="{{ user_form.email.id_for_label }}"
+                    class="form-label"
+                    >Email</label
+                  >
+                  {{ user_form.email }} {% if user_form.email.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.email.errors }}
+                  </div>
+                  {% endif %}
                 </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label
+                    for="{{ user_form.password1.id_for_label }}"
+                    class="form-label"
+                    >Password</label
+                  >
+                  {{ user_form.password1 }} {% if user_form.password1.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.password1.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="mb-3">
+                  <label
+                    for="{{ user_form.password2.id_for_label }}"
+                    class="form-label"
+                    >Confirm Password</label
+                  >
+                  {{ user_form.password2 }} {% if user_form.password2.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.password2.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
             </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label
+                    for="{{ user_form.phone_number.id_for_label }}"
+                    class="form-label"
+                    >Phone Number</label
+                  >
+                  {{ user_form.phone_number }} {% if user_form.phone_number.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.phone_number.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label
+                    for="{{ user_form.address.id_for_label }}"
+                    class="form-label"
+                    >Address</label
+                  >
+                  {{ user_form.address }} {% if user_form.address.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ user_form.address.errors }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
+
+        <div class="col-md-6">
+          <div class="form-section">
+            <h6 class="card-title-divider">Hospital Information</h6>
+
+            <div class="mb-3">
+              <label
+                for="{{ hospital_form.hospital_name.id_for_label }}"
+                class="form-label"
+                >Hospital Name</label
+              >
+              {{ hospital_form.hospital_name }} {% if hospital_form.hospital_name.errors %}
+              <div class="invalid-feedback d-block">
+                {{ hospital_form.hospital_name.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label
+                for="{{ hospital_form.contact_info.id_for_label }}"
+                class="form-label"
+                >Contact Information</label
+              >
+              {{ hospital_form.contact_info }} {% if hospital_form.contact_info.errors %}
+              <div class="invalid-feedback d-block">
+                {{ hospital_form.contact_info.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            {% if request.user.user_type == 'district_admin' %}
+            <div class="mb-3">
+              <label
+                for="{{ hospital_form.local_leader.id_for_label }}"
+                class="form-label"
+                >Assign to Local Leader</label
+              >
+              {{ hospital_form.local_leader }} 
+              {% if hospital_form.local_leader.errors %}
+              <div class="invalid-feedback d-block">
+                {{ hospital_form.local_leader.errors }}
+              </div>
+              {% endif %}
+              <div class="form-text">
+                Select the Local Leader who will be responsible for this
+                hospital.
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4">
+        <a
+          href="{% url 'accounts:hospital_list' %}"
+          class="btn btn-outline-secondary me-2"
+        >
+          <i class="fas fa-arrow-left me-1"></i> Back to List
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-1"></i> Create Hospital
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
-{% endblock %} 
+{% endblock %}
